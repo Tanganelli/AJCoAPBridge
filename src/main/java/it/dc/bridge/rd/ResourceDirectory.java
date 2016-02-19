@@ -1,4 +1,4 @@
-package it.dc.bridge;
+package it.dc.bridge.rd;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -7,15 +7,15 @@ import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.EndpointManager;
 import org.eclipse.californium.core.network.config.NetworkConfig;
-import org.eclipse.californium.tools.resources.RDResource;
 
 /**
  * The class ResourceDirectory provides a RD that implements
  * the functions required to register, maintain and remove the
- * CoAP resources. It does not implement resource lookup.
+ * CoAP resources. It does not implement resource lookup, as
+ * described in draft-ietf-core-resource-directory-05.
  * 
- * For the management of the resources, it uses the classes provided
- * by the cf-rd package.
+ * For the management of the resources, ResourceDirectory
+ * uses the classes provided by the cf-rd package.
  */ 
 public class ResourceDirectory extends CoapServer{
 
@@ -31,9 +31,9 @@ public class ResourceDirectory extends CoapServer{
 	}
 
 	/**
-     * Add individual endpoints listening on default CoAP port
-     * on all IP addresses of all network interfaces.
-     */
+	 * Add individual endpoints listening on default CoAP port
+	 * on all IP addresses of all network interfaces.
+	 */
 	private void addEndpoints() {
 
 		for (InetAddress addr : EndpointManager.getEndpointManager().getNetworkInterfaces()) {
