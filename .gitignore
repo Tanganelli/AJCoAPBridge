@@ -69,3 +69,9 @@ local.properties
  
 # PDT-specific
 .buildpath
+
+# Logs and databases
+Californium.properties
+*.log
+*.sql
+*.sqlite
