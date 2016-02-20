@@ -8,7 +8,7 @@ package it.dc.bridge.om;
  * The following methods are implemented:
  * <ul>
  * <li> {@link #getCode()} get the response code </li>
- * <li> {@link #setCode(ResponseCode)} set the response code </li>
+ * <li> {@link #setCode(CoAP.ResponseCode)} set the response code </li>
  * <li> {@link #getOptions()} get the option fields </li>
  * <li> {@link #setOptions(Options)} set the option fields</li>
  * <li> {@link #getPayload()} get the message payload </li>
@@ -16,28 +16,28 @@ package it.dc.bridge.om;
  * <li> {@link #setPayload(byte[])} set the message payload from raw data </li>
  * <li> {@link #setPayload(String)} set the message payload from a string </li>
  * </ul>
- * @see CoAPResponseMessage
+ * @see CoAPRequestMessage
  */
 public interface CoAPResponseMessage {
 
 	/**
 	 * Returns the response code of the message.
 	 * @return the response code
-	 * @see CoAP#ResponseCode
+	 * @see CoAP
 	 */
 	public CoAP.ResponseCode getCode();
 	
 	/**
 	 * Sets the message response code.
 	 * @param code the response code
-	 * @see CoAP#ResponseCode
+	 * @see CoAP
 	 */
 	public void setCode(CoAP.ResponseCode code);
 
 	/**
 	 * Returns a class containing the option fields.
 	 * @see Options
-	 * @return
+	 * @return the option fields
 	 */
 	public Options getOptions();
 	

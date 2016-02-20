@@ -25,7 +25,7 @@ public interface CoAPRequestMessage {
 	/**
 	 * Returns a class containing the option fields.
 	 * @see Options
-	 * @return
+	 * @return the option fields
 	 */
 	public Options getOptions();
 	
