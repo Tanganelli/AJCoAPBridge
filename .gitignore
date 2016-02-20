@@ -13,6 +13,15 @@ target/
 *.war
 *.ear
 *.db
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
  
 ######################
 # Windows
@@ -37,8 +46,7 @@ Desktop.ini
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
- 
- 
+  
 ######################
 # Eclipse
 ######################
