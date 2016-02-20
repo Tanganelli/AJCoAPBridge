@@ -14,6 +14,7 @@ import java.util.Map;
  * <li> {@link #getAttributes()} get the query attributes </li>
  * <li> {@link #setAttributes(Map)} set the query attributes </li>
  * <li> {@link #getPayload()} get the message payload </li>
+ * <li> {@link #getPayloadString()} get the message payload as a string</li>
  * <li> {@link #setPayload(byte[])} set the message payload from raw data </li>
  * <li> {@link #setPayload(String)} set the message payload from a string </li>
  * </ul>
