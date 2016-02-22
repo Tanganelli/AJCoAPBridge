@@ -19,10 +19,13 @@ import org.eclipse.californium.core.network.config.NetworkConfig;
  */ 
 public class ResourceDirectory extends CoapServer{
 
-	private static ResourceDirectory resourceDirectory = null;
+	private static final ResourceDirectory resourceDirectory = new ResourceDirectory();
 	private static final int COAP_PORT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.COAP_PORT);
 	
-	public ResourceDirectory() {
+	/**
+	 * Instantiates a new Resource Directory.
+	 */
+	private ResourceDirectory() {
 
 		RDResource rdResource = new RDResource(); 
 
@@ -33,16 +36,13 @@ public class ResourceDirectory extends CoapServer{
 	
 	/**
 	 * The Resource Directory is a Singleton.
-	 * This method returns the class instance and, if it is null,
-	 * creates it before.
+	 * This method returns the class instance.
 	 * @return the class instance
 	 */
 	public static ResourceDirectory getInstance() {
-		if (resourceDirectory == null){
-			resourceDirectory = new ResourceDirectory();
-		}
 		
 		return resourceDirectory;
+		
 	}
 
 	/**
@@ -61,15 +61,13 @@ public class ResourceDirectory extends CoapServer{
 
 	public static void main(String[] args) {
 
-		// create resource directory
-		ResourceDirectory resourceDirectory = new ResourceDirectory();
-
 		// add endpoints on all IP addresses
 		resourceDirectory.addEndpoints();
 
 		resourceDirectory.start(); 
 
 		System.out.printf(ResourceDirectory.class.getSimpleName() + " listening on port %d.\n", resourceDirectory.getEndpoints().get(0).getAddress().getPort());
+		
 	}
 
 }
