@@ -22,8 +22,13 @@ import org.alljoyn.bus.annotation.BusSignal;
  * <li> {@link #Cancellation()} cancellation from the resource observing service. </li>
  * <li> {@link #Notification(CoAPResponseMessage)} signal that represents a resource notification. </li>
  * </ul>
+ * <p>
+ * The signatures of the methods parameters reflect the attributes inside
+ * the {@link RequestMessage} and the {@link ResponseMessage} classes.
  * @see CoAPRequestMessage
  * @see CoAPResponseMessage
+ * @see RequestMessage
+ * @see ResponseMessage
  */
 @BusInterface (name="com.coap.rest")
 public interface CoAPInterface {
@@ -38,7 +43,7 @@ public interface CoAPInterface {
 	 * the message contains 2.05 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="rr")
+	@BusMethod(signature="(ra{ss}ay)(iray)")
 	public void Get(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
 
 	/**
@@ -51,7 +56,7 @@ public interface CoAPInterface {
 	 * the message contains 2.04 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="rr")
+	@BusMethod(signature="(ra{ss}ay)(iray)")
 	public void Post(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
 
 	/**
@@ -63,7 +68,7 @@ public interface CoAPInterface {
 	 * the message contains 2.02 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="r")
+	@BusMethod(signature="(iray)")
 	public void Delete(CoAPResponseMessage response) throws BusException;
 
 	/**
@@ -92,7 +97,7 @@ public interface CoAPInterface {
 	 * the resource representation.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusSignal(signature="r")
+	@BusSignal(signature="(iray)")
 	public void Notification(CoAPResponseMessage message) throws BusException;
 
 }
