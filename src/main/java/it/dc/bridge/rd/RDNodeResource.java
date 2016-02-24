@@ -46,6 +46,7 @@ public class RDNodeResource extends CoapResource {
 	 * 
 	 * @param request A POST or PUT request with a {?et,lt,con} URI Template query
 	 * 			and a Link Format payload.
+	 * @param resources An empty CoapResource list in which new resources are inserted
 	 * 
 	 */
 	public boolean setParameters(Request request, List<CoapResource> resources) {
@@ -200,6 +201,8 @@ public class RDNodeResource extends CoapResource {
 	 * register. Each resource is separated by ",". E.g. A node can
 	 * register a resource for reading the temperature and another one
 	 * for reading the humidity.
+	 * @param linkFormat The registration payload
+	 * @param resources An empty list in which the new resources are inserted
 	 */
 	private boolean updateEndpointResources(String linkFormat, List<CoapResource> resources) {
 
