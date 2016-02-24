@@ -1,5 +1,6 @@
 package it.dc.bridge.rd;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.californium.core.CoapResource;
@@ -47,6 +48,7 @@ public class RDResource extends CoapResource {
 		String endpointIdentifier = ""; 
 		String domain = "local"; 
 		RDNodeResource resource = null; 
+		List<CoapResource> resources = new ArrayList<CoapResource>();
 
 		ResponseCode responseCode; 
 
@@ -96,22 +98,25 @@ public class RDResource extends CoapResource {
 		} 
 
 		// set parameters of resource 
-		if (!resource.setParameters(exchange.advanced().getRequest())) { 
+		if (!resource.setParameters(exchange.advanced().getRequest(), resources)) { 
 			resource.delete(); 
 			exchange.respond(ResponseCode.BAD_REQUEST); 
 			return; 
 		} 
 
-		LOGGER.info("Adding new endpoint: "+resource.getContext()); 
+		LOGGER.info("Adding new endpoint: "+resource.getContext());
 		
 		String location = resource.getURI();
-		System.out.println("Location: "+location);
-
-		// inform AJ Object Manager Application about the registration of a new resource
-		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
-		//objectManager.addResource(location, resource.getPath());
 		
-		objectManager.printResources();
+		if(!resources.isEmpty()){
+			// inform AJ Object Manager Application about the registration of a new resource
+			AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
+			
+			for(CoapResource r : resources)
+				objectManager.addResource(r.getURI());
+			
+			objectManager.printResources();
+		}
 		
 		// inform client about the location of the new resource 
 		exchange.setLocationPath(location); 

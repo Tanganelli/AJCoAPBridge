@@ -48,7 +48,7 @@ public class RDNodeResource extends CoapResource {
 	 * 			and a Link Format payload.
 	 * 
 	 */
-	public boolean setParameters(Request request) {
+	public boolean setParameters(Request request, List<CoapResource> resources) {
 
 		LinkAttribute attr;
 		
@@ -92,7 +92,7 @@ public class RDNodeResource extends CoapResource {
 			return false;
 		}
 		
-		return updateEndpointResources(request.getPayloadString());
+		return updateEndpointResources(request.getPayloadString(), resources);
 	}
 
 	/*
@@ -162,7 +162,7 @@ public class RDNodeResource extends CoapResource {
 		
 		LOGGER.info("Updating endpoint: "+getContext());
 		
-		setParameters(exchange.advanced().getRequest());
+		setParameters(exchange.advanced().getRequest(), null);
 		
 		// complete the request
 		exchange.respond(ResponseCode.CHANGED);
@@ -201,7 +201,7 @@ public class RDNodeResource extends CoapResource {
 	 * register a resource for reading the temperature and another one
 	 * for reading the humidity.
 	 */
-	private boolean updateEndpointResources(String linkFormat) {
+	private boolean updateEndpointResources(String linkFormat, List<CoapResource> resources) {
 
 		Scanner scanner = new Scanner(linkFormat);
 		
@@ -228,6 +228,8 @@ public class RDNodeResource extends CoapResource {
 			System.out.println("RDNodeResource: path: "+path);
 			
 			CoapResource resource = addNodeResource(path);
+			resources.add(resource);
+
 			/*
 			 * Since created the subResource, get all the attributes from
 			 * the payload. Each parameter is separated by a ";".
