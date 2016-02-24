@@ -58,13 +58,32 @@ public class AJObjectManagerApp {
 		
 	}
 	
+	public void removeResource(String objectPath) {
+		List<CoAPResource> toRemove = getResourcesFromNode(objectPath);
+		
+		for(CoAPResource c : toRemove) {
+			mBus.unregisterBusObject(c);
+		}
+	}
+	
+	private List<CoAPResource> getResourcesFromNode(String objectPath) {
+		
+		List<CoAPResource> ret = new ArrayList<CoAPResource>();
+		
+		for(CoAPResource c : resources)
+			if(c.getPath().contains(objectPath))
+				ret.add(c);
+			
+		return ret;
+	}
+
 	public void printResources() {
 		
 		for(CoAPResource r : resources) {
 			System.out.println(r.getPath());
 		}
 	}
-	
+		
 	public static void main (String[]args) {
         
         Status status;

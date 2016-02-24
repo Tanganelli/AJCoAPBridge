@@ -16,24 +16,26 @@ import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.tools.resources.LinkAttribute;
 
+import it.dc.bridge.om.AJObjectManagerApp;
+
 public class RDNodeResource extends CoapResource {
 
 	private static final Logger LOGGER = Logger.getLogger(RDNodeResource.class.getCanonicalName());
-	
+
 	/*
 	 * After the lifetime expires, the endpoint has RD_VALIDATION_TIMEOUT seconds
 	 * to update its entry before the RD enforces validation and removes the endpoint
 	 * if it does not respond.
 	 */
 	private Timer lifetimeTimer;
-	
+
 	private int lifeTime;
-	
+
 	private String endpointIdentifier;
 	private String domain;
 	private String endpointType;
 	private String context;
-	
+
 	public RDNodeResource(String endpointID, String domain) {
 		super(endpointID);		
 		this.endpointIdentifier = endpointID;
@@ -52,10 +54,10 @@ public class RDNodeResource extends CoapResource {
 	public boolean setParameters(Request request, List<CoapResource> resources) {
 
 		LinkAttribute attr;
-		
+
 		int newLifeTime = 86400;
 		String newContext = "";
-		
+
 		/*
 		 * get lifetime from option query - only for PUT request.
 		 */
@@ -63,23 +65,23 @@ public class RDNodeResource extends CoapResource {
 		for (String q : query) {
 			// FIXME Do not use Link attributes for URI template variables
 			attr = LinkAttribute.parse(q);
-			
+
 			if (attr.getName().equals(LinkFormat.LIFE_TIME)) {
 				newLifeTime = attr.getIntValue();
-				
+
 				if (newLifeTime < 60) {
 					LOGGER.info("Enforcing minimal RD lifetime of 60 seconds (was "+newLifeTime+")");
 					newLifeTime = 60;
 				}
 			}
-			
+
 			if (attr.getName().equals(LinkFormat.CONTEXT)){
 				newContext = attr.getValue();
 			}
 		}
-		
+
 		setLifeTime(newLifeTime);
-		
+
 		try {
 			URI check;
 			if (newContext.equals("")) {
@@ -92,7 +94,7 @@ public class RDNodeResource extends CoapResource {
 			LOGGER.warning(e.toString());
 			return false;
 		}
-		
+
 		return updateEndpointResources(request.getPayloadString(), resources);
 	}
 
@@ -107,7 +109,7 @@ public class RDNodeResource extends CoapResource {
 		String next = "";
 		boolean resourceExist = false;
 		Resource resource = this; // It's the resource that represents the endpoint
-		
+
 		CoapResource subResource = null;
 		while (scanner.hasNext()) {
 			resourceExist = false;
@@ -134,11 +136,11 @@ public class RDNodeResource extends CoapResource {
 	public void delete() {
 
 		LOGGER.info("Removing endpoint: "+getContext());
-		
+
 		if (lifetimeTimer!=null) {
 			lifetimeTimer.cancel();
 		}
-		
+
 		super.delete();
 	}
 
@@ -149,33 +151,38 @@ public class RDNodeResource extends CoapResource {
 	public void handleGET(CoapExchange exchange) {
 		exchange.respond(ResponseCode.FORBIDDEN, "RD update handle");
 	}
-	
+
 	/*
 	 * PUTs content to this resource. PUT is a periodic request from the
 	 * node to update the lifetime.
 	 */
 	@Override
 	public void handlePOST(CoapExchange exchange) {
-		
+
 		if (lifetimeTimer != null) {
 			lifetimeTimer.cancel();
 		}
-		
+
 		LOGGER.info("Updating endpoint: "+getContext());
-		
+
 		setParameters(exchange.advanced().getRequest(), null);
-		
+
 		// complete the request
 		exchange.respond(ResponseCode.CHANGED);
-		
+
 	}
-	
+
 	/*
 	 * DELETEs this node resource
 	 */
 	@Override
 	public void handleDELETE(CoapExchange exchange) {
 		delete();
+
+		// inform the AJ Object Manager Application about the resource removal
+		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
+		objectManager.removeResource(this.getName());
+
 		exchange.respond(ResponseCode.DELETED);
 	}
 
@@ -184,18 +191,18 @@ public class RDNodeResource extends CoapResource {
 	 * the lifetime (for PUT request)
 	 */
 	public void setLifeTime(int newLifeTime) {
-		
+
 		lifeTime = newLifeTime;
-		
+
 		if (lifetimeTimer != null) {
 			lifetimeTimer.cancel();
 		}
-		
+
 		lifetimeTimer = new Timer();
 		lifetimeTimer.schedule(new ExpiryTask(this), lifeTime * 1000 + 2000);// from sec to ms
-	
+
 	}
-		
+
 	/**
 	 * Creates a new subResource for each resource the node wants
 	 * register. Each resource is separated by ",". E.g. A node can
@@ -207,7 +214,7 @@ public class RDNodeResource extends CoapResource {
 	private boolean updateEndpointResources(String linkFormat, List<CoapResource> resources) {
 
 		Scanner scanner = new Scanner(linkFormat);
-		
+
 		scanner.useDelimiter(",");
 		List<String> pathResources = new ArrayList<String>();
 		while (scanner.hasNext()) {
@@ -227,9 +234,7 @@ public class RDNodeResource extends CoapResource {
 				scanner.close();
 				return false;
 			}
-			
-			System.out.println("RDNodeResource: path: "+path);
-			
+
 			CoapResource resource = addNodeResource(path);
 			resources.add(resource);
 
@@ -251,7 +256,7 @@ public class RDNodeResource extends CoapResource {
 			resource.getAttributes().addAttribute(LinkFormat.END_POINT, getEndpointIdentifier());
 		}
 		scanner.close();
-		
+
 		return true;
 	}
 
@@ -263,7 +268,7 @@ public class RDNodeResource extends CoapResource {
 
 		// Create new StringBuilder
 		StringBuilder builder = new StringBuilder();
-		
+
 		// Build the link format
 		buildLinkFormat(this, builder, query);
 
@@ -277,14 +282,14 @@ public class RDNodeResource extends CoapResource {
 
 	public String toLinkFormatItem(Resource resource) {
 		StringBuilder linkFormat = new StringBuilder();
-		
+
 		linkFormat.append("<"+getContext());
 		linkFormat.append(resource.getURI().substring(this.getURI().length()));
 		linkFormat.append(">");
-		
+
 		return linkFormat.append( LinkFormat.serializeResource(resource).toString().replaceFirst("<.+>", "") ).toString();
 	}
-	
+
 
 	private void buildLinkFormat(Resource resource, StringBuilder builder, List<String> query) {
 		if (resource.getChildren().size() > 0) {
@@ -303,9 +308,9 @@ public class RDNodeResource extends CoapResource {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	/*
 	 * Setter And Getter
 	 */
@@ -333,7 +338,7 @@ public class RDNodeResource extends CoapResource {
 	public void setContext(String context) {
 		this.context = context;
 	}
-	
+
 	class ExpiryTask extends TimerTask {
 		RDNodeResource resource;
 
@@ -347,6 +352,6 @@ public class RDNodeResource extends CoapResource {
 			delete();
 		}
 	}
-	
+
 }
 

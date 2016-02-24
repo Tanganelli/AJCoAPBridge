@@ -75,7 +75,6 @@ public class RDResource extends CoapResource {
 		} 
 
 		for (Resource node : getChildren()) { 
-			System.out.println("RDResource: name: "+node.getName()+" path: "+node.getPath());
 			if (((RDNodeResource) node).getEndpointIdentifier().equals(endpointIdentifier) && ((RDNodeResource) node).getDomain().equals(domain)) { 
 				resource = (RDNodeResource) node; 
 			} 
@@ -90,7 +89,6 @@ public class RDResource extends CoapResource {
 
 			resource = new RDNodeResource(endpointIdentifier, domain); 
 			add(resource);
-			System.out.println("RDResource: res name: "+resource.getName()+" res path: "+resource.getPath());
 
 			responseCode = ResponseCode.CREATED; 
 		} else { 
