@@ -69,9 +69,9 @@ public class AJObjectManagerApp {
 	private List<CoAPResource> getResourcesFromNode(String objectPath) {
 		
 		List<CoAPResource> ret = new ArrayList<CoAPResource>();
-		
+
 		for(CoAPResource c : resources)
-			if(c.getPath().contains(objectPath))
+			if(c.getPath().startsWith(objectPath))
 				ret.add(c);
 			
 		return ret;

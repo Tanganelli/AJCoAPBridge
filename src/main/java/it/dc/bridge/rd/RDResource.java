@@ -116,6 +116,8 @@ public class RDResource extends CoapResource {
 			objectManager.printResources();
 		}
 		
+		resource.setLocation(location);
+		
 		// inform client about the location of the new resource 
 		exchange.setLocationPath(location); 
 
