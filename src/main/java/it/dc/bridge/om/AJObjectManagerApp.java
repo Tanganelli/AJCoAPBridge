@@ -10,7 +10,6 @@ import org.alljoyn.bus.Mutable;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.SessionPortListener;
 import org.alljoyn.bus.Status;
-import org.eclipse.californium.core.CoapServer;
 
 /**
  * AJObjectManager is the AllJoyn class that provides
@@ -24,17 +23,17 @@ public class AJObjectManagerApp {
 		System.loadLibrary("alljoyn_java");
 	}
 
-	/** The logger. */
-	private final static Logger LOGGER = Logger.getLogger(CoapServer.class.getCanonicalName());
 	private static final short CONTACT_PORT=42;
 	
-	static boolean sessionEstablished = false;
-    static int sessionId;
-
-	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
-	private BusAttachment mBus;
+	/** The logger. */
+	private final static Logger LOGGER = Logger.getGlobal();
+	
+    private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
 
 	private List<CoAPResource> resources = new ArrayList<CoAPResource>();
+	private BusAttachment mBus;
+	private static boolean sessionEstablished = false;
+	
 
 	/**
 	 * The AJ Object Manager is a Singleton.
@@ -60,7 +59,7 @@ public class AJObjectManagerApp {
 
 		Status status = mBus.registerBusObject(resource, objectPath);
 		if (Status.OK != status) {
-			System.out.println("BusAttachment.registerBusObject() failed: " + status);
+			LOGGER.warning("BusAttachment.registerBusObject() failed: " + status);
 
 			return;
 		}
@@ -115,48 +114,96 @@ public class AJObjectManagerApp {
 		}
 	}
 
+	/**
+	 * Starts the AllJoyn Object Manager application.
+	 * The method does the follow:
+	 * <ul>
+	 * <li>Connects the Object Manager to the AllJoyn Bus</li>
+	 * <li>Registers a Bus Listener</li>
+	 * <li>Requests and advertises a well known name</li>
+	 * <li>Binds the session port</li>
+	 * <li>Starts the OM as a server to listen the requests from the AJ network</li>
+	 * </ul>
+	 */
 	public void start() {
 
 		LOGGER.info("Starting AllJoyn server");
 
 		mBus = new BusAttachment("CoAPBridge");
 
-		BusListener listener = new MyBusListener();
+		// register a listener to the bus
+		BusListener listener = new BusListener();
         mBus.registerBusListener(listener);
         
+        // connect to the bus
 		Status status = mBus.connect();
 		if (status != Status.OK) {
-			System.out.println("BusAttachment.connect() failed: " + status);
+			LOGGER.warning("BusAttachment.connect() failed: " + status);
 			System.exit(0);
 			return;
 		}
-		System.out.println("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address")); 
+		LOGGER.info("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address")); 
 
+		// request a well known name
 		int flags = 0; //no request name flags
 		status = mBus.requestName("com.bridge.coap", flags);
 		if (status != Status.OK) {
-			System.out.println("BusAttachment.requestName failed: " + status);
+			LOGGER.warning("BusAttachment.requestName failed: " + status);
 			System.exit(0);
 			return;
 		}
-		System.out.println("BusAttachment.request 'com.bridge.coap' successful");
+		LOGGER.info("BusAttachment.request 'com.bridge.coap' successful");
 		
+		// advertise the well known name
 		status = mBus.advertiseName("com.bridge.coap", SessionOpts.TRANSPORT_ANY);
         if (status != Status.OK) {
-            System.out.println("Status = " + status);
+            LOGGER.warning("Status = " + status);
             mBus.releaseName("com.bridge.coap");
             return;
         }
-        System.out.println("BusAttachment.advertiseName 'com.bridge.coap' successful");
+        LOGGER.info("BusAttachment.advertiseName 'com.bridge.coap' successful");
 
+        Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
+
+		SessionOpts sessionOpts = new SessionOpts();
+		sessionOpts.traffic = SessionOpts.TRAFFIC_MESSAGES;
+		sessionOpts.isMultipoint = true;
+		sessionOpts.proximity = SessionOpts.PROXIMITY_ANY;
+		sessionOpts.transports = SessionOpts.TRANSPORT_ANY;
+		
+		// bind session port with the session options
+		objectManager.bindSessionPort(contactPort, sessionOpts);
+		
+		while (!sessionEstablished) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                LOGGER.warning("Thread Exception caught");
+                e.printStackTrace();
+            }
+        }
+        LOGGER.info("BusAttachment session established");
+
+        while (true) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                LOGGER.warning("Thread Exception caught");
+                e.printStackTrace();
+            }
+        }
+        
 	}
 	
+	/*
+	 * Bind to the session port with the given session options
+	 */
 	private void bindSessionPort(Mutable.ShortValue contactPort, SessionOpts sessionOpts) {
 		
 		Status status = mBus.bindSessionPort(contactPort, sessionOpts, 
                 new SessionPortListener() {
             public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
-                System.out.println("SessionPortListener.acceptSessionJoiner called");
+                LOGGER.info("SessionPortListener.acceptSessionJoiner called");
                 if (sessionPort == CONTACT_PORT) {
                     return true;
                 } else {
@@ -164,58 +211,20 @@ public class AJObjectManagerApp {
                 }
             }
             public void sessionJoined(short sessionPort, int id, String joiner) {
-                System.out.println(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
-                sessionId = id;
+                LOGGER.info(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
                 sessionEstablished = true;
             }
         });
         if (status != Status.OK) {
             return;
         }
-        System.out.println("BusAttachment.bindSessionPort successful");
+        LOGGER.info("BusAttachment.bindSessionPort successful");
 		
 	}
-
-	private static class MyBusListener extends BusListener {
-        public void nameOwnerChanged(String busName, String previousOwner, String newOwner) {
-            if ("com.my.well.known.name".equals(busName)) {
-                System.out.println("BusAttachement.nameOwnerChanged(" + busName + ", " + previousOwner + ", " + newOwner);
-            }
-        }
-    }
 	
 	public static void main(String[] args) {
 		
 		objectManager.start();
-
-		Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
-
-		SessionOpts sessionOpts = new SessionOpts();
-		sessionOpts.traffic = SessionOpts.TRAFFIC_MESSAGES;
-		sessionOpts.isMultipoint = false;
-		sessionOpts.proximity = SessionOpts.PROXIMITY_ANY;
-		sessionOpts.transports = SessionOpts.TRANSPORT_ANY;
-		
-		objectManager.bindSessionPort(contactPort, sessionOpts);
-		
-		while (!sessionEstablished) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                System.out.println("Thread Exception caught");
-                e.printStackTrace();
-            }
-        }
-        System.out.println("BusAttachment session established");
-
-        while (true) {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                System.out.println("Thread Exception caught");
-                e.printStackTrace();
-            }
-        }
-
+		objectManager.printResources();
 	}
 }

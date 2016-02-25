@@ -41,7 +41,6 @@ public class RDNodeResource extends CoapResource {
 		super(endpointID);		
 		this.endpointIdentifier = endpointID;
 		this.domain = domain;
-		System.out.println("New RDNodeResource: "+endpointID);
 	}
 
 	/**
@@ -50,7 +49,7 @@ public class RDNodeResource extends CoapResource {
 	 * @param request A POST or PUT request with a {?et,lt,con} URI Template query
 	 * 			and a Link Format payload.
 	 * @param resources An empty CoapResource list in which new resources are inserted
-	 * 
+	 * @return the result of the resource update funcion
 	 */
 	public boolean setParameters(Request request, List<CoapResource> resources) {
 
@@ -103,7 +102,9 @@ public class RDNodeResource extends CoapResource {
 	 * Add a new resource to the node. E.g. the resource temperature or
 	 * humidity. If the path is /readings/temp, temp will be a subResource
 	 * of readings, which is a subResource of the node.
+	 * 
 	 * @param path the resource path
+	 * @return the created resource
 	 */
 	public CoapResource addNodeResource(String path) {
 		Scanner scanner = new Scanner(path);
