@@ -99,10 +99,11 @@ public class RDNodeResource extends CoapResource {
 		return updateEndpointResources(request.getPayloadString(), resources);
 	}
 
-	/*
-	 * add a new resource to the node. E.g. the resource temperature or
+	/**
+	 * Add a new resource to the node. E.g. the resource temperature or
 	 * humidity. If the path is /readings/temp, temp will be a subResource
 	 * of readings, which is a subResource of the node.
+	 * @param path the resource path
 	 */
 	public CoapResource addNodeResource(String path) {
 		Scanner scanner = new Scanner(path);
@@ -173,23 +174,30 @@ public class RDNodeResource extends CoapResource {
 
 	}
 
-	/*
-	 * DELETEs this node resource
+	/**
+	 * Handles the DELETE request in the given CoAPExchange.
+	 * DELETEs this node resource and informs the AllJoyn Object Manager
+	 * about the resource removal.
+	 * The response code to a DELETE request should be a Deleted (2.02).
 	 */
 	@Override
 	public void handleDELETE(CoapExchange exchange) {
-		delete();
 
 		// inform the AJ Object Manager Application about the resource removal
 		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
 		objectManager.removeResource(this.getLocation());
 
+		objectManager.printResources();
+		
+		delete();
+		
 		exchange.respond(ResponseCode.DELETED);
 	}
 
-	/*
-	 * set either a new lifetime (for new resources, POST request) or update
+	/**
+	 * Set either a new lifetime (for new resources, POST request) or update
 	 * the lifetime (for PUT request)
+	 * @param newLifeTime the new lifetime
 	 */
 	public void setLifeTime(int newLifeTime) {
 

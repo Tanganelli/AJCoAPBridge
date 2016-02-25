@@ -43,6 +43,12 @@ public class AJObjectManagerApp {
 		
 	}
 	
+	/**
+	 * Creates a new AllJoyn CoAPResource and registers it
+	 * to the AllJoyn Bus.
+	 * 
+	 * @param objectPath the object path
+	 */
 	public void addResource(String objectPath) {
 		
 		CoAPResource resource = new CoAPResource(objectPath);
@@ -58,27 +64,47 @@ public class AJObjectManagerApp {
 		
 	}
 	
+	/**
+	 * Removes and unregisters AllJoyn CoAP resources.
+	 * 
+	 * @param objectPath location of the resources
+	 */
 	public void removeResource(String objectPath) {
 		List<CoAPResource> toRemove = getResourcesFromNode(objectPath);
 		
 		for(CoAPResource c : toRemove) {
 			mBus.unregisterBusObject(c);
+			resources.remove(c);
 		}
+			
 	}
 	
+	/*
+	 * Returns the list of CoAP resources in the location
+	 * given as parameter.
+	 */
 	private List<CoAPResource> getResourcesFromNode(String objectPath) {
 		
 		List<CoAPResource> ret = new ArrayList<CoAPResource>();
 
-		for(CoAPResource c : resources)
-			if(c.getPath().startsWith(objectPath))
+		for(CoAPResource c : resources) {
+			if(c.getPath().startsWith(objectPath)) {
 				ret.add(c);
+			}
+		}
 			
 		return ret;
 	}
 
+	/**
+	 * Prints the object path of the registered AllJoyn resources.
+	 */
 	public void printResources() {
 		
+		if(resources.isEmpty()){
+			System.out.println("There are not registered resources");
+			return;
+		}
 		for(CoAPResource r : resources) {
 			System.out.println(r.getPath());
 		}
