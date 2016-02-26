@@ -51,6 +51,11 @@ public class AJObjectManagerApp implements Runnable {
 		}
 	}
 
+	/*
+	 * Since the class is a singleton, the constructor must be private
+	 */
+	private AJObjectManagerApp() {}
+	
 	/**
 	 * The AJ Object Manager is a Singleton.
 	 * This method returns the class instance.
