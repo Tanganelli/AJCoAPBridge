@@ -113,6 +113,8 @@ public class RDResource extends CoapResource {
 			for(CoapResource r : resources)
 				objectManager.addResource(r.getURI());
 			
+			objectManager.printResources();
+			
 		}
 		
 		resource.setLocation(location);

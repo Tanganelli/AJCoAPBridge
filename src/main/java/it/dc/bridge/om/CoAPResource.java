@@ -104,5 +104,10 @@ public class CoAPResource implements CoAPInterface, BusObject{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public int meth() throws BusException {
+		System.out.println("daje");
+		return 56;
+	}
 
 }

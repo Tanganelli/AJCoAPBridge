@@ -2,8 +2,6 @@ package it.dc.bridge.om;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import org.alljoyn.bus.BusAttachment;
@@ -31,25 +29,8 @@ public class AJObjectManagerApp implements Runnable {
 
 	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
 	
-    private ExecutorService pool = null;
-
-	private List<CoAPResource> resources = new ArrayList<CoAPResource>();
-	private BusAttachment mBus;
-	
-	class ListenerService implements Runnable {
-
-		public void run() {
-
-			while (true) {
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					LOGGER.warning("Thread Exception caught");
-					e.printStackTrace();
-				}
-			}	
-		}
-	}
+	private static List<CoAPResource> resources = new ArrayList<CoAPResource>();
+	private static BusAttachment mBus;
 
 	/*
 	 * Since the class is a singleton, the constructor must be private
@@ -74,7 +55,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * 
 	 * @param objectPath the object path
 	 */
-	public void addResource(String objectPath) {
+	public synchronized void addResource(String objectPath) {
 
 		CoAPResource resource = new CoAPResource(objectPath);
 
@@ -94,7 +75,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * 
 	 * @param objectPath location of the resources
 	 */
-	public void removeResource(String objectPath) {
+	public synchronized void removeResource(String objectPath) {
 		List<CoAPResource> toRemove = getResourcesFromNode(objectPath);
 
 		for(CoAPResource c : toRemove) {
@@ -140,7 +121,6 @@ public class AJObjectManagerApp implements Runnable {
 	 * The method does the follow:
 	 * <ul>
 	 * <li>Connects the Object Manager to the AllJoyn Bus</li>
-	 * <li>Registers a Bus Listener</li>
 	 * <li>Requests and advertises a well known name</li>
 	 * <li>Binds the session port</li>
 	 * <li>Starts the OM as a server to listen the requests from the AJ network</li>
@@ -152,10 +132,10 @@ public class AJObjectManagerApp implements Runnable {
 
 		mBus = new BusAttachment("CoAPBridge");
 
-		// register a listener to the bus
+		// register bus listener
 		BusListener listener = new BusListener();
-		mBus.registerBusListener(listener);
-
+        mBus.registerBusListener(listener);
+        
 		// connect to the bus
 		Status status = mBus.connect();
 		if (status != Status.OK) {
@@ -222,19 +202,18 @@ public class AJObjectManagerApp implements Runnable {
 		LOGGER.info("BusAttachment.bindSessionPort successful");
 
 	}
-
+	
 	public void run() {
 
 		objectManager.start();
 		
 		try {
-            pool = Executors.newFixedThreadPool(5);
-            ListenerService listener = new ListenerService();
-            pool.submit(listener);
-        }
-        catch ( Exception e ) {
-            e.printStackTrace();
-        }
+			synchronized(this){
+				this.wait();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
 	}
 
