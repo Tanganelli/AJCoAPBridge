@@ -1,11 +1,63 @@
 package it.dc.bridge.om;
 
+import java.nio.charset.Charset;
+
 /**
  * CoAP defines the ResponseCode constants.
  * It is similar to the CoAP class inside Californium,
- * but it provides only the ResponseCode enumerator.
+ * but it provides only the request code and response code enumerators.
  */
 public class CoAP {
+
+	/**  The CoAP charset is always UTF-8. */
+	public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+	
+	/**
+	 * The enumeration of request codes: GET, POST; PUT and DELETE.
+	 */
+	public enum RequestCode {
+
+		/** The GET code. */
+		GET(1),
+
+		/** The POST code. */
+		POST(2),
+
+		/** The PUT code. */
+		PUT(3),
+
+		/** The DELETE code. */
+		DELETE(4);
+
+		/** The code value. */
+		public final int value;
+
+		/**
+		 * Instantiates a new code with the specified code value.
+		 *
+		 * @param value the integer value of the code
+		 */
+		RequestCode(int value) {
+			this.value = value;
+		}
+
+		/**
+		 * Converts the specified integer value to a request code.
+		 *
+		 * @param value the integer value
+		 * @return the request code
+		 * @throws IllegalArgumentException if the integer value is unrecognized
+		 */
+		public static RequestCode valueOf(int value) {
+			switch (value) {
+			case 1: return GET;
+			case 2: return POST;
+			case 3: return PUT;
+			case 4: return DELETE;
+			default: throw new IllegalArgumentException("Unknwon CoAP request code "+value);
+			}
+		}
+	}
 
 	/**
 	 * The enumeration of response codes.
