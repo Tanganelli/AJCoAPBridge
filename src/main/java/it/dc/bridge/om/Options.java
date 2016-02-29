@@ -1,5 +1,8 @@
 package it.dc.bridge.om;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.alljoyn.bus.annotation.Position;
 import org.alljoyn.bus.annotation.Signature;
 
@@ -18,8 +21,8 @@ public class Options {
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
 	@Position(1)
-	@Signature("ay")
-	private byte[] etag;
+	@Signature("a(ay)")
+	private List<byte[]> etag;
 	
 	/** Which Content-Format is acceptable to the client. */
 	@Position(2)
@@ -29,8 +32,8 @@ public class Options {
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
 	@Position(3)
-	@Signature("ay")
-	private byte[] ifMatch;
+	@Signature("a(ay)")
+	private List<byte[]> ifMatch;
 	
 	/** To make a request conditional on the nonexistence of the target resource. */
 	@Position(4)
@@ -91,18 +94,31 @@ public class Options {
 		this.contentFormat = contentFormat;
 	}
 
-	/** Returns the ETag.
+	/** Returns the list of ETags.
 	 * @return the ETag
 	 */
-	public byte[] getEtag() {
+	public List<byte[]> getEtag() {
+		if (etag == null)
+			synchronized (this) {
+				if (etag == null)
+					etag = new LinkedList<byte[]>();
+			}
 		return etag;
+	}
+	
+	/**
+	 * Returns the number of ETag options.
+	 * @return the count
+	 */
+	public int getETagCount() {
+		return getEtag().size();
 	}
 
 	/**
 	 * Sets the ETag.
 	 * @param etag ETag to set
 	 */
-	public void setEtag(byte[] etag) {
+	public void setEtag(List<byte[]> etag) {
 		this.etag = etag;
 	}
 
@@ -134,15 +150,28 @@ public class Options {
 	 * Returns the If-Match ETag.
 	 * @return the If-Match ETag
 	 */
-	public byte[] getIfMatch() {
+	public List<byte[]> getIfMatch() {
+		if (ifMatch == null)
+			synchronized (this) {
+				if (ifMatch == null)
+					ifMatch = new LinkedList<byte[]>();
+			}
 		return ifMatch;
+	}
+	
+	/**
+	 * Returns the number of If-Match options.
+	 * @return the count
+	 */
+	public int getIfMatchCount() {
+		return getIfMatch().size();
 	}
 
 	/**
 	 * Sets the If-Match options to an ETag.
 	 * @param ifMatch the If-Match ETag to set
 	 */
-	public void setIfMatch(byte[] ifMatch) {
+	public void setIfMatch(List<byte[]> ifMatch) {
 		this.ifMatch = ifMatch;
 	}
 
