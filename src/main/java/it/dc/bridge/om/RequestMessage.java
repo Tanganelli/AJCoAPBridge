@@ -17,31 +17,33 @@ public class RequestMessage implements CoAPRequestMessage{
 	/** The option fields. */
 	@Position(0)
 	@Signature("r")
-	Options opt;
+	private Options options;
 	
 	/** The query attributes */
 	@Position(1)
 	@Signature("a{ss}")
-	Map<String,String> attr;
+	private Map<String,String> attributes;
 	
 	/** The message payload. */
 	@Position(2)
 	@Signature("ay")
-	byte[] payload;
+	private byte[] payload;
 	
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPRequestMessage#getOptions()
 	 */
 	public Options getOptions() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.options;
+		
 	}
 	
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPRequestMessage#setOptions(it.dc.bridge.om.Options)
 	 */
 	public void setOptions(Options options) {
-		// TODO Auto-generated method stub
+
+		this.options = options;
 		
 	}
 	
@@ -49,15 +51,17 @@ public class RequestMessage implements CoAPRequestMessage{
 	 * @see it.dc.bridge.om.CoAPRequestMessage#getAttributes()
 	 */
 	public Map<String, String> getAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.attributes;
+		
 	}
 	
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPRequestMessage#setAttributes(java.util.Map)
 	 */
 	public void setAttributes(Map<String, String> attributes) {
-		// TODO Auto-generated method stub
+
+		this.attributes = attributes;
 		
 	}
 	
@@ -65,23 +69,28 @@ public class RequestMessage implements CoAPRequestMessage{
 	 * @see it.dc.bridge.om.CoAPRequestMessage#getPayload()
 	 */
 	public byte[] getPayload() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.payload;
+		
 	}
 	
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPRequestMessage#getPayloadString()
 	 */
 	public String getPayloadString() {
-		// TODO Auto-generated method stub
-		return null;
+
+		if(this.payload == null) {
+			return "";
+		}
+		return new String(this.payload, CoAP.UTF8_CHARSET);
 	}
 	
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPRequestMessage#setPayload(byte[])
 	 */
 	public void setPayload(byte[] payload) {
-		// TODO Auto-generated method stub
+
+		this.payload = payload;
 		
 	}
 	
@@ -89,9 +98,13 @@ public class RequestMessage implements CoAPRequestMessage{
 	 * @see it.dc.bridge.om.CoAPRequestMessage#setPayload(java.lang.String)
 	 */
 	public void setPayload(String payload) {
-		// TODO Auto-generated method stub
+
+		if(payload == null) {
+			this.payload = null;
+		} else {
+			setPayload(payload.getBytes(CoAP.UTF8_CHARSET));
+		}
 		
 	}
-	
 	
 }
