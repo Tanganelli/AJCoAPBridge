@@ -71,7 +71,7 @@ public class Options {
 	 * Returns the Content-Format Identifier of the Content-Format option.
 	 * @return the ID as int or -1 if undefined
 	 */
-	private int getContentFormat() {
+	public int getContentFormat() {
 		return hasContentFormat() ? contentFormat : -1;
 	}
 	
@@ -87,14 +87,14 @@ public class Options {
 	 * Sets the Content-Format ID of the Content-Format option.
 	 * @param contentFormat the content format ID
 	 */
-	private void setContentFormat(Integer contentFormat) {
+	public void setContentFormat(Integer contentFormat) {
 		this.contentFormat = contentFormat;
 	}
 
 	/** Returns the ETag.
 	 * @return the ETag
 	 */
-	private byte[] getEtag() {
+	public byte[] getEtag() {
 		return etag;
 	}
 
@@ -102,7 +102,7 @@ public class Options {
 	 * Sets the ETag.
 	 * @param etag ETag to set
 	 */
-	private void setEtag(byte[] etag) {
+	public void setEtag(byte[] etag) {
 		this.etag = etag;
 	}
 
@@ -110,7 +110,7 @@ public class Options {
 	 * Returns the Content-Format Identifier of the Accept option.
 	 * @return the ID as int or -1 if undefined
 	 */
-	private int getAccept() {
+	public int getAccept() {
 		return hasAccept() ? accept : -1;
 	}
 	
@@ -126,7 +126,7 @@ public class Options {
 	 * Sets the Content-Format ID of the Accept option.
 	 * @param accept the Content-Format ID
 	 */
-	private void setAccept(Integer accept) {
+	public void setAccept(Integer accept) {
 		this.accept = accept;
 	}
 
@@ -134,7 +134,7 @@ public class Options {
 	 * Returns the If-Match ETag.
 	 * @return the If-Match ETag
 	 */
-	private byte[] getIfMatch() {
+	public byte[] getIfMatch() {
 		return ifMatch;
 	}
 
@@ -142,7 +142,7 @@ public class Options {
 	 * Sets the If-Match options to an ETag.
 	 * @param ifMatch the If-Match ETag to set
 	 */
-	private void setIfMatch(byte[] ifMatch) {
+	public void setIfMatch(byte[] ifMatch) {
 		this.ifMatch = ifMatch;
 	}
 
@@ -150,7 +150,7 @@ public class Options {
 	 * Checks if the If-None-Match option is present.
 	 * @return true if present
 	 */
-	private boolean getIfNoneMatch() {
+	public boolean getIfNoneMatch() {
 		return ifNoneMatch;
 	}
 
@@ -158,7 +158,7 @@ public class Options {
 	 * Sets or unsets the If-None-Match option.
 	 * @param ifNoneMatch the presence of the option
 	 */
-	private void setIfNoneMatch(Boolean ifNoneMatch) {
+	public void setIfNoneMatch(Boolean ifNoneMatch) {
 		this.ifNoneMatch = ifNoneMatch;
 	}
 
@@ -166,7 +166,7 @@ public class Options {
 	 * Returns the uint value of the Size1 option.
 	 * @return the Size1 value or null if the option is not present
 	 */
-	private Integer getSize1() {
+	public Integer getSize1() {
 		return size1;
 	}
 
@@ -174,7 +174,7 @@ public class Options {
 	 * Sets the Size1 option value.
 	 * @param size the size of the request body
 	 */
-	private void setSize1(Integer size1) {
+	public void setSize1(Integer size1) {
 		this.size1 = size1;
 	}
 
