@@ -3,6 +3,8 @@ package it.dc.bridge.om;
 import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.BusObject;
 
+import it.dc.bridge.om.CoAP.RequestCode;
+
 /**
  * The Class CoAPResource is an AllJoyn object representing the CoAP resource.
  * It implements the CoAPInterface interface which offers the CoAP RESTful methods
@@ -60,31 +62,33 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Get(it.dc.bridge.om.CoAPRequestMessage, it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void Get(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
-		// TODO Auto-generated method stub
-		
+	public void get(final CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
+
+		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.GET, request, response);
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Post(it.dc.bridge.om.CoAPRequestMessage, it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void Post(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
-		// TODO Auto-generated method stub
+	public void post(final CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
+
+		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.POST, request, response);
 		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Delete(it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void Delete(CoAPResponseMessage response) throws BusException {
-		// TODO Auto-generated method stub
+	public void delete(CoAPResponseMessage response) throws BusException {
+
+		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null, response);
 		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Registration()
 	 */
-	public void Registration() throws BusException {
+	public void registration() throws BusException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -92,7 +96,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Cancellation()
 	 */
-	public void Cancellation() throws BusException {
+	public void cancellation() throws BusException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -100,7 +104,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Notification(it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void Notification(CoAPResponseMessage message) throws BusException {
+	public void notification(CoAPResponseMessage message) throws BusException {
 		// TODO Auto-generated method stub
 		
 	}

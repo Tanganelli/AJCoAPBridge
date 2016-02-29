@@ -44,7 +44,7 @@ public interface CoAPInterface {
 	 * @throws BusException AllJoyn bus exception
 	 */
 	@BusMethod(signature="(ra{ss}ay)(iray)")
-	public void Get(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
+	public void get(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
 
 	/**
 	 * The POST method. It executes a POST method on the
@@ -57,7 +57,7 @@ public interface CoAPInterface {
 	 * @throws BusException AllJoyn bus exception
 	 */
 	@BusMethod(signature="(ra{ss}ay)(iray)")
-	public void Post(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
+	public void post(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
 
 	/**
 	 * The DELETE method. It executes a DELETE method on the
@@ -69,7 +69,7 @@ public interface CoAPInterface {
 	 * @throws BusException AllJoyn bus exception
 	 */
 	@BusMethod(signature="(iray)")
-	public void Delete(CoAPResponseMessage response) throws BusException;
+	public void delete(CoAPResponseMessage response) throws BusException;
 
 	/**
 	 * The registration method is invoked by an AJ application
@@ -78,7 +78,7 @@ public interface CoAPInterface {
 	 * @throws BusException AllJoyn bus exception
 	 */
 	@BusMethod
-	public void Registration() throws BusException;
+	public void registration() throws BusException;
 
 	/**
 	 * The cancellation method is invoked by an AJ application
@@ -87,7 +87,7 @@ public interface CoAPInterface {
 	 * @throws BusException AllJoyn bus exception
 	 */
 	@BusMethod
-	public void Cancellation() throws BusException;
+	public void cancellation() throws BusException;
 
 	/**
 	 * Notification is a signal sent by the AJ object when it
@@ -98,7 +98,7 @@ public interface CoAPInterface {
 	 * @throws BusException AllJoyn bus exception
 	 */
 	@BusSignal(signature="(iray)")
-	public void Notification(CoAPResponseMessage message) throws BusException;
+	public void notification(CoAPResponseMessage message) throws BusException;
 	
 	@BusMethod
 	public int meth() throws BusException;
