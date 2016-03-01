@@ -99,8 +99,5 @@ public interface CoAPInterface {
 	 */
 	@BusSignal(signature="(iray)")
 	public void notification(CoAPResponseMessage message) throws BusException;
-	
-	@BusMethod
-	public int meth() throws BusException;
 
 }
