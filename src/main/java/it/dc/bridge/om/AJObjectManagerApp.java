@@ -2,6 +2,7 @@ package it.dc.bridge.om;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.alljoyn.bus.BusAttachment;
@@ -10,6 +11,13 @@ import org.alljoyn.bus.Mutable;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.SessionPortListener;
 import org.alljoyn.bus.Status;
+import org.eclipse.californium.core.coap.CoAP.Code;
+import org.eclipse.californium.core.coap.OptionSet;
+import org.eclipse.californium.core.coap.Request;
+import org.eclipse.californium.core.coap.Response;
+
+import it.dc.bridge.om.CoAP.RequestCode;
+import it.dc.bridge.proxy.CoAPProxy;
 
 /**
  * AJObjectManager is the AllJoyn class that provides
@@ -24,11 +32,11 @@ public class AJObjectManagerApp implements Runnable {
 	}
 
 	private static final short CONTACT_PORT=42;
-	
+
 	private static final Logger LOGGER = Logger.getGlobal();
 
 	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
-	
+
 	private static List<CoAPResource> resources = new ArrayList<CoAPResource>();
 	private static BusAttachment mBus;
 
@@ -36,7 +44,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * Since the class is a singleton, the constructor must be private
 	 */
 	private AJObjectManagerApp() {}
-	
+
 	/**
 	 * The AJ Object Manager is a Singleton.
 	 * This method returns the class instance.
@@ -117,6 +125,85 @@ public class AJObjectManagerApp implements Runnable {
 	}
 
 	/**
+	 * Send the method call to the CoAP Proxy.
+	 * The request message to be sent to the Proxy is the Californium <tt>Request</tt>.
+	 * So, the method creates the Request starting from a message implementing
+	 * the {@link CoAPRequestMessage} interface.
+	 * The method call response from the Proxy is a Californium <tt>Response</tt>.
+	 * This method translates the response message into a {@link CoAPResponseMessage}.
+	 * @param path the URI path
+	 * @param code the request code
+	 * @param request a message implementing the request interface
+	 * @param response an empty message implementing the response interface, it will
+	 * contain the method response
+	 */
+	public void callMethod(final String path, final RequestCode code, 
+			final CoAPRequestMessage request, CoAPResponseMessage response) {
+
+		// create a Californium request from the CoAPRequestMessage request
+		Request coapRequest = getRequest(code, request);
+		
+		Response coapResponse = CoAPProxy.getInstance().callMethod(coapRequest);
+
+	}
+
+	/**
+	 * Starting from a CoAPRequest message, the method fills a new Californium
+	 * Request message.
+	 * 
+	 * @param code the request code
+	 * @param request the CoAP request
+	 * @return the Californium CoAP request
+	 */
+	private Request getRequest(final RequestCode code, final CoAPRequestMessage request) {
+
+		// create the request
+		Request coapRequest = new Request(Code.valueOf(code.value));
+
+		// set confirmable
+		coapRequest.setConfirmable(true);
+
+		// copy the payload
+		coapRequest.setPayload(request.getPayload());
+
+		Options options = request.getOptions();
+
+		// copy the options
+		OptionSet coapOpt = new OptionSet();
+		if(options.hasContentFormat())
+			coapOpt.setContentFormat(options.getContentFormat());
+		for(byte[] e : options.getEtag())
+			coapOpt.addETag(e);
+		if(options.hasAccept())
+			coapOpt.setAccept(options.getAccept());
+		for(byte[] e : options.getIfMatch())
+			coapOpt.addIfMatch(e);
+		coapOpt.setIfNoneMatch(options.getIfNoneMatch());
+		coapOpt.setSize1(options.getSize1());
+
+		// copy the query attributes
+		Map<String,String> attributes = request.getAttributes();
+		List<String> queryAttrs = new ArrayList<String>();
+		for(Map.Entry<String, String> entry : attributes.entrySet()) {
+			queryAttrs.add(entry.getKey()+"="+entry.getValue());
+		}
+		StringBuilder builder = new StringBuilder();
+		for(String s : queryAttrs){
+			builder.append(s).append("&");
+		}
+		if (builder.length() > 0){
+			builder.delete(builder.length() - 1, builder.length());
+		}
+		coapOpt.setUriQuery(builder.toString());
+		
+		// set request options
+		coapRequest.setOptions(coapOpt);
+
+		return coapRequest;
+
+	}
+
+	/**
 	 * Starts the AllJoyn Object Manager application.
 	 * The method does the follow:
 	 * <ul>
@@ -134,8 +221,8 @@ public class AJObjectManagerApp implements Runnable {
 
 		// register bus listener
 		BusListener listener = new BusListener();
-        mBus.registerBusListener(listener);
-        
+		mBus.registerBusListener(listener);
+
 		// connect to the bus
 		Status status = mBus.connect();
 		if (status != Status.OK) {
@@ -202,11 +289,11 @@ public class AJObjectManagerApp implements Runnable {
 		LOGGER.info("BusAttachment.bindSessionPort successful");
 
 	}
-	
+
 	public void run() {
 
 		objectManager.start();
-		
+
 		try {
 			synchronized(this){
 				this.wait();
@@ -214,7 +301,7 @@ public class AJObjectManagerApp implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }
