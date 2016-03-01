@@ -12,9 +12,7 @@ public class Bridge {
 				
 		resourceDirectory.run();
 		
-		objectManager.run();
-		objectManager.printResources();
-		
+		objectManager.run();		
 		
 	}
 	
