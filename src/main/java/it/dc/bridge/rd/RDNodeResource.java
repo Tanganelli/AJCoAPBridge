@@ -35,12 +35,12 @@ public class RDNodeResource extends CoapResource {
 	private String domain;
 	private String endpointType;
 	private String context;
-	private String location;
 
 	public RDNodeResource(String endpointID, String domain) {
 		super(endpointID);		
 		this.endpointIdentifier = endpointID;
 		this.domain = domain;
+		
 	}
 
 	/**
@@ -186,9 +186,9 @@ public class RDNodeResource extends CoapResource {
 
 		// inform the AJ Object Manager Application about the resource removal
 		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
-		objectManager.removeResource(this.getLocation());
-
-		objectManager.printResources();
+		objectManager.removeResource(this.getEndpointIdentifier());
+		
+		ResourceDirectory.getInstance().removeContext(this.getEndpointIdentifier());
 		
 		delete();
 		
@@ -347,14 +347,6 @@ public class RDNodeResource extends CoapResource {
 
 	public void setContext(String context) {
 		this.context = context;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
 	}
 
 	class ExpiryTask extends TimerTask {

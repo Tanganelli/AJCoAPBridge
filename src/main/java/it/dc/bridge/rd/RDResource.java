@@ -110,14 +110,12 @@ public class RDResource extends CoapResource {
 			// inform AJ Object Manager Application about the registration of a new resource
 			AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
 			
-			for(CoapResource r : resources)
+			for(CoapResource r : resources) {
 				objectManager.addResource(r.getURI());
-			
-			objectManager.printResources();
-			
+			}		
 		}
 		
-		resource.setLocation(location);
+		ResourceDirectory.getInstance().addContext(resource.getEndpointIdentifier(), resource.getContext());
 		
 		// inform client about the location of the new resource 
 		exchange.setLocationPath(location); 
