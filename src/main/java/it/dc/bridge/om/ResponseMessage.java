@@ -2,6 +2,7 @@ package it.dc.bridge.om;
 
 import org.alljoyn.bus.annotation.Position;
 import org.alljoyn.bus.annotation.Signature;
+import org.eclipse.californium.core.coap.CoAP;
 
 import it.dc.bridge.om.CoAP.ResponseCode;
 
@@ -23,26 +24,39 @@ public class ResponseMessage implements CoAPResponseMessage{
 	/** The opt. */
 	@Position(1)
 	@Signature("r")
-	Options opt;
+	Options options;
 	
 	/** The payload. */
 	@Position(2)
 	@Signature("ay")
 	byte[] payload;
 	
+	/**
+	 * Instantiates a new response with the specified response code.
+	 *
+	 * @param code the response code
+	 */
+	public ResponseMessage(ResponseCode code) {
+		
+		this.code = code;
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPResponseMessage#getCode()
 	 */
 	public ResponseCode getCode() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.code;
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPResponseMessage#setCode(it.dc.bridge.om.CoAP.ResponseCode)
 	 */
 	public void setCode(ResponseCode code) {
-		// TODO Auto-generated method stub
+
+		this.code = code;
 		
 	}
 
@@ -50,15 +64,17 @@ public class ResponseMessage implements CoAPResponseMessage{
 	 * @see it.dc.bridge.om.CoAPResponseMessage#getOptions()
 	 */
 	public Options getOptions() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.options;
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPResponseMessage#setOptions(it.dc.bridge.om.Options)
 	 */
 	public void setOptions(Options options) {
-		// TODO Auto-generated method stub
+
+		this.options = options;
 		
 	}
 
@@ -66,23 +82,28 @@ public class ResponseMessage implements CoAPResponseMessage{
 	 * @see it.dc.bridge.om.CoAPResponseMessage#getPayload()
 	 */
 	public byte[] getPayload() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.payload;
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPResponseMessage#getPayloadString()
 	 */
 	public String getPayloadString() {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (payload==null)
+			return "";
+		return new String(payload, CoAP.UTF8_CHARSET);
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPResponseMessage#setPayload(byte[])
 	 */
 	public void setPayload(byte[] payload) {
-		// TODO Auto-generated method stub
+
+		this.payload = payload;
 		
 	}
 
@@ -90,7 +111,12 @@ public class ResponseMessage implements CoAPResponseMessage{
 	 * @see it.dc.bridge.om.CoAPResponseMessage#setPayload(java.lang.String)
 	 */
 	public void setPayload(String payload) {
-		// TODO Auto-generated method stub
+
+		if (payload == null) {
+			this.payload = null;
+		} else {
+			setPayload(payload.getBytes(CoAP.UTF8_CHARSET));
+		}
 		
 	}
 
