@@ -17,6 +17,7 @@ import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 
 import it.dc.bridge.om.CoAP.RequestCode;
+import it.dc.bridge.om.CoAP.ResponseCode;
 import it.dc.bridge.proxy.CoAPProxy;
 
 /**
@@ -142,14 +143,18 @@ public class AJObjectManagerApp implements Runnable {
 
 		// create a Californium request from the CoAPRequestMessage request
 		Request coapRequest = getRequest(code, request);
-		
-		Response coapResponse = CoAPProxy.getInstance().callMethod(coapRequest);
+
+		// send the method call to the Proxy
+		Response coapResponse = CoAPProxy.callMethod(path, coapRequest);
+
+		// create a CoAPResponseMessage from the Californium Response
+		response = getResponse(coapResponse);
 
 	}
 
 	/**
-	 * Starting from a CoAPRequest message, the method fills a new Californium
-	 * Request message.
+	 * Starting from a {@link CoAPRequestMessage}, the method fills a new Californium
+	 * <tt>Request</tt> message.
 	 * 
 	 * @param code the request code
 	 * @param request the CoAP request
@@ -195,12 +200,46 @@ public class AJObjectManagerApp implements Runnable {
 			builder.delete(builder.length() - 1, builder.length());
 		}
 		coapOpt.setUriQuery(builder.toString());
-		
+
 		// set request options
 		coapRequest.setOptions(coapOpt);
 
 		return coapRequest;
 
+	}
+
+	/**
+	 * Starting from a Californium <tt>Response</tt>, the method fills a new
+	 * {@link CoAPResponseMessage}.
+	 * 
+	 * @param coapResponse the Californium CoAP response message
+	 * @return the CoAPResponse message
+	 */
+	private CoAPResponseMessage getResponse(Response coapResponse) {
+
+		org.eclipse.californium.core.coap.CoAP.ResponseCode code = coapResponse.getCode();
+
+		// create the response
+		ResponseMessage response = new ResponseMessage(ResponseCode.valueOf(code.value));
+
+		// copy the options
+		OptionSet coapOpt = coapResponse.getOptions();
+		Options options = new Options();
+		if(coapOpt.hasContentFormat())
+			options.setContentFormat(coapOpt.getContentFormat());
+		options.setEtag(coapOpt.getETags());
+		if(coapOpt.hasAccept())
+			options.setAccept(coapOpt.getAccept());
+		options.setIfMatch(coapOpt.getIfMatch());
+		options.setIfNoneMatch(coapOpt.hasIfNoneMatch());
+		options.setSize1(coapOpt.getSize1());
+		
+		response.setOptions(options);
+
+		// copy the payload
+		response.setPayload(coapResponse.getPayload());
+
+		return response;
 	}
 
 	/**
