@@ -2,7 +2,6 @@ package it.dc.bridge.om;
 
 import org.alljoyn.bus.annotation.Position;
 import org.alljoyn.bus.annotation.Signature;
-import org.eclipse.californium.core.coap.CoAP;
 
 import it.dc.bridge.om.CoAP.ResponseCode;
 
