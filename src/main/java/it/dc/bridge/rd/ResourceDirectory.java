@@ -2,8 +2,8 @@ package it.dc.bridge.rd;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
@@ -28,9 +28,9 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	private static final int COAP_PORT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.COAP_PORT);
 
 	/* Map containing the identifier-context pair for each registered node */
-	private Map<String,String> contexts = new HashMap<String,String>();
-	private Map<String,String> resources = new HashMap<String,String>();
-	
+	private Map<String, String> contexts = new ConcurrentHashMap<String,String>();
+	private Map<String,String> resources = new ConcurrentHashMap<String,String>();
+
 	/**
 	 * Instantiates a new Resource Directory.
 	 * Since it is a Singleton, the constructor is private.
@@ -68,46 +68,48 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Associates the specified context with the specified node 
 	 * in the context map. 
 	 * If the map previously contained a mapping for the node, 
 	 * the old context is replaced by the specified context.
 	 * 
-	 * @param path node identifier
+	 * @param nodeID node identifier
 	 * @param context node context
 	 */
-	public void addContext(String nodeID, String context) {
-		
+	public synchronized void addNode(String nodeID, String context) {
+
 		contexts.put(nodeID, context);
-		
+
 	}
-	
+
 	/**
 	 * Returns the context to which the specified node is mapped,
 	 * or null if this map contains no mapping for the node identifier
 	 * 
-	 * @param path the node identifier
+	 * @param nodeID the node identifier
 	 * @return the node context, if present
 	 */
-	public String getContext(String nodeID) {
-		
+	public synchronized String getContext(String nodeID) {
+
 		return contexts.get(nodeID);
-		
+
 	}
-	
+
 	/**
 	 * Removes the mapping for a node identifier from this map if it is present.
+	 * Informs the resource map about the node removal.
 	 * 
-	 * @param path the node identifier
+	 * @param nodeID the node identifier
 	 */
-	public void removeContext(String nodeID) {
-		
+	public synchronized void removeNode(String nodeID) {
+
 		contexts.remove(nodeID);
-		
+		removeEntries(nodeID);
+
 	}
-	
+
 	/**
 	 * Associates the specified resource with the specified node 
 	 * in the resource map.
@@ -118,18 +120,44 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 * @param node the node resources
 	 * @param resource the new registered resource
 	 */
-	public void addEntry(RDNodeResource node, CoapResource resource) {
+	public synchronized void addEntry(RDNodeResource node, CoapResource resource) {
 		
+		// TODO store the entry in the database, if implemented
+
 		resources.put(resource.getURI(), node.getEndpointIdentifier());
-		addContext(node.getEndpointIdentifier(), node.getContext());
-		
+		addNode(node.getEndpointIdentifier(), node.getContext());
+
 		// inform the Object Manager about the new resource
 		AJObjectManagerApp.getInstance().addResource(resource.getURI());
-		
+
 	}
-	
-	public void printMaps() {
+
+	/**
+	 * Removes the mapping for the resources with a specific associated node.
+	 * For each removed resource, the method informs the Object Manager about
+	 * the resource removal.
+	 * 
+	 * @param nodeID the node identifier
+	 */
+	public synchronized void removeEntries(String nodeID) {
+
+		//TODO delete entries from the database, if implemented
 		
+		for(Map.Entry<String, String> e : resources.entrySet()) {
+			if(e.getValue().equals(nodeID)) {
+				resources.remove(e.getKey());
+				
+				// inform the Object Manager about the resource removal
+				AJObjectManagerApp.getInstance().removeResource(e.getKey());
+			}
+		}
+	}
+
+	/**
+	 * Prints all the entries for both the context map and the resource map.
+	 */
+	public synchronized void printMaps() {
+
 		System.out.println("Context map:");
 		for(Map.Entry<String,String> e : contexts.entrySet()) {
 			System.out.println(e.getKey()+" - "+e.getValue());
@@ -138,9 +166,9 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		for(Map.Entry<String,String> e : resources.entrySet()) {
 			System.out.println(e.getKey()+" - "+e.getValue());
 		}
-		
+
 	}
-	
+
 	public void run() {
 
 		// add endpoints on all IP addresses

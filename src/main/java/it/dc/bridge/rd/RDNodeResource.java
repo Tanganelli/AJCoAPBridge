@@ -16,8 +16,6 @@ import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.tools.resources.LinkAttribute;
 
-import it.dc.bridge.om.AJObjectManagerApp;
-
 /**
  * An <tt>RDNodeResource</tt> represents the Endpoint.
  * It is created after a node registration and its children are
@@ -156,6 +154,8 @@ public class RDNodeResource extends CoapResource {
 		}
 
 		super.delete();
+		ResourceDirectory.getInstance().removeNode(this.getEndpointIdentifier());
+
 	}
 
 	/*
@@ -197,18 +197,11 @@ public class RDNodeResource extends CoapResource {
 
 	/**
 	 * Handles the DELETE request in the given CoAPExchange.
-	 * DELETEs this node resource and informs the AllJoyn Object Manager
-	 * about the resource removal.
+	 * DELETEs this node resource.
 	 * The response code to a DELETE request should be a Deleted (2.02).
 	 */
 	@Override
 	public void handleDELETE(CoapExchange exchange) {
-
-		// inform the AJ Object Manager Application about the resource removal
-		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
-		objectManager.removeResource(this.getEndpointIdentifier());
-
-		ResourceDirectory.getInstance().removeContext(this.getEndpointIdentifier());
 
 		delete();
 

@@ -118,10 +118,8 @@ public class RDResource extends CoapResource {
 
 		String location = resource.getURI();
 
-		ResourceDirectory.getInstance().addContext(resource.getEndpointIdentifier(), resource.getContext());
+		ResourceDirectory.getInstance().addNode(resource.getEndpointIdentifier(), resource.getContext());
 
-		ResourceDirectory.getInstance().printMaps();
-		
 		// inform client about the location of the new resource 
 		exchange.setLocationPath(location); 
 
