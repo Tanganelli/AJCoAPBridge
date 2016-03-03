@@ -18,6 +18,13 @@ import org.eclipse.californium.tools.resources.LinkAttribute;
 
 import it.dc.bridge.om.AJObjectManagerApp;
 
+/**
+ * An <tt>RDNodeResource</tt> represents the Endpoint.
+ * It is created after a node registration and its children are
+ * the resources offer by the Endpoint.
+ * The resource is only for the purpose of the Update (POST) and
+ * Removal (DELETE), and must not implement GET or PUT methods.
+ */
 public class RDNodeResource extends CoapResource {
 
 	private static final Logger LOGGER = Logger.getLogger(RDNodeResource.class.getCanonicalName());
@@ -44,12 +51,15 @@ public class RDNodeResource extends CoapResource {
 	}
 
 	/**
-	 * Updates the endpoint parameters from POST and PUT requests.
+	 * Updates the endpoint parameters from POST requests.
+	 * The parameters that can be changed are the Endpoint lifetime <i>lt</i>
+	 * and the Endpoint context <i>con</i>, the only two parameters allowed
+	 * in the registration update.
 	 * 
-	 * @param request A POST or PUT request with a {?et,lt,con} URI Template query
+	 * @param request A POST request with a {?lt,con} URI Template query
 	 * 			and a Link Format payload.
 	 * @param resources An empty CoapResource list in which new resources are inserted
-	 * @return the result of the resource update funcion
+	 * @return the result of the resource update function
 	 */
 	public boolean setParameters(Request request, List<CoapResource> resources) {
 
@@ -63,7 +73,7 @@ public class RDNodeResource extends CoapResource {
 		 */
 		List<String> query = request.getOptions().getUriQuery();
 		for (String q : query) {
-			// FIXME Do not use Link attributes for URI template variables
+
 			attr = LinkAttribute.parse(q);
 
 			if (attr.getName().equals(LinkFormat.LIFE_TIME)) {
@@ -155,9 +165,13 @@ public class RDNodeResource extends CoapResource {
 		exchange.respond(ResponseCode.FORBIDDEN, "RD update handle");
 	}
 
-	/*
-	 * PUTs content to this resource. PUT is a periodic request from the
-	 * node to update the lifetime.
+	/**
+	 * The update interface is used by an endpoint to refresh or update its
+	 * registration with an RD.  To use the interface, the endpoint sends a
+	 * POST request to the resource returned in the Location option in the
+	 * response to the first registration. An update may update the
+	 * lifetime or context parameters if they have changed since the last
+	 * registration or update.
 	 */
 	@Override
 	public void handlePOST(CoapExchange exchange) {
@@ -173,6 +187,11 @@ public class RDNodeResource extends CoapResource {
 		// complete the request
 		exchange.respond(ResponseCode.CHANGED);
 
+	}
+
+	@Override
+	public void handlePUT(CoapExchange exchange) {
+		exchange.respond(ResponseCode.FORBIDDEN);
 	}
 
 	/**
@@ -363,7 +382,7 @@ public class RDNodeResource extends CoapResource {
 	public void setContext(String context) {
 		this.context = context;
 	}
-	
+
 	/**
 	 * Returns the Endpoint lifetime <i>lt</i>.
 	 * This field is optional during registration.
@@ -373,7 +392,7 @@ public class RDNodeResource extends CoapResource {
 	public int getLifetime() {
 		return lifeTime;
 	}
-	
+
 	/**
 	 * Set either a new lifetime (for new resources, POST request) or update
 	 * the lifetime (for PUT request)
