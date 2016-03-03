@@ -3,6 +3,7 @@ package it.dc.bridge.om;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.alljoyn.bus.BusAttachment;
@@ -11,10 +12,10 @@ import org.alljoyn.bus.Mutable;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.SessionPortListener;
 import org.alljoyn.bus.Status;
+import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
-import org.eclipse.californium.core.coap.Response;
 
 import it.dc.bridge.om.CoAP.RequestCode;
 import it.dc.bridge.om.CoAP.ResponseCode;
@@ -38,7 +39,7 @@ public class AJObjectManagerApp implements Runnable {
 
 	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
 
-	private static List<CoAPResource> resources = new ArrayList<CoAPResource>();
+	private static Map<String,CoAPResource> resources = new ConcurrentHashMap<String,CoAPResource>();
 	private static BusAttachment mBus;
 
 	/*
@@ -75,53 +76,33 @@ public class AJObjectManagerApp implements Runnable {
 			return;
 		}
 
-		resources.add(resource);
+		resources.put(objectPath, resource);
 
 	}
 
 	/**
-	 * Removes and unregisters AllJoyn CoAP resources.
+	 * Removes and unregisters an AllJoyn CoAP resource.
 	 * 
-	 * @param objectPath location of the resources
+	 * @param objectPath location of the resource
 	 */
 	public synchronized void removeResource(String objectPath) {
-		List<CoAPResource> toRemove = getResourcesFromNode(objectPath);
 
-		for(CoAPResource c : toRemove) {
-			mBus.unregisterBusObject(c);
-			resources.remove(c);
-		}
+		mBus.unregisterBusObject(resources.get(objectPath));
+		resources.remove(objectPath);
 
-	}
-
-	/*
-	 * Returns the list of CoAP resources in the location
-	 * given as parameter.
-	 */
-	private List<CoAPResource> getResourcesFromNode(String objectPath) {
-
-		List<CoAPResource> ret = new ArrayList<CoAPResource>();
-
-		for(CoAPResource c : resources) {
-			if(c.getPath().startsWith(objectPath)) {
-				ret.add(c);
-			}
-		}
-
-		return ret;
 	}
 
 	/**
 	 * Prints the object path of the registered AllJoyn resources.
 	 */
-	public void printResources() {
+	public synchronized void printResources() {
 
 		if(resources.isEmpty()){
 			System.out.println("There are not registered resources");
 			return;
 		}
-		for(CoAPResource r : resources) {
-			System.out.println(r.getPath());
+		for(Map.Entry<String, CoAPResource> e : resources.entrySet()) {
+			System.out.println(e.getKey());
 		}
 	}
 
@@ -138,14 +119,14 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param response an empty message implementing the response interface, it will
 	 * contain the method response
 	 */
-	public void callMethod(final String path, final RequestCode code, 
+	public synchronized void callMethod(final String path, final RequestCode code, 
 			final CoAPRequestMessage request, CoAPResponseMessage response) {
 
 		// create a Californium request from the CoAPRequestMessage request
 		Request coapRequest = getRequest(code, request);
 
 		// send the method call to the Proxy
-		Response coapResponse = CoAPProxy.callMethod(path, coapRequest);
+		CoapResponse coapResponse = CoAPProxy.callMethod(path, coapRequest);
 
 		// create a CoAPResponseMessage from the Californium Response
 		response = getResponse(coapResponse);
@@ -184,23 +165,25 @@ public class AJObjectManagerApp implements Runnable {
 		for(byte[] e : options.getIfMatch())
 			coapOpt.addIfMatch(e);
 		coapOpt.setIfNoneMatch(options.getIfNoneMatch());
-		coapOpt.setSize1(options.getSize1());
+		if(options.getSize1() != null)
+			coapOpt.setSize1(options.getSize1());
 
 		// copy the query attributes
 		Map<String,String> attributes = request.getAttributes();
-		List<String> queryAttrs = new ArrayList<String>();
-		for(Map.Entry<String, String> entry : attributes.entrySet()) {
-			queryAttrs.add(entry.getKey()+"="+entry.getValue());
+		if(!attributes.isEmpty()) {
+			List<String> queryAttrs = new ArrayList<String>();
+			for(Map.Entry<String, String> entry : attributes.entrySet()) {
+				queryAttrs.add(entry.getKey()+"="+entry.getValue());
+			}
+			StringBuilder builder = new StringBuilder();
+			for(String s : queryAttrs){
+				builder.append(s).append("&");
+			}
+			if (builder.length() > 0){
+				builder.delete(builder.length() - 1, builder.length());
+			}
+			coapOpt.setUriQuery(builder.toString());
 		}
-		StringBuilder builder = new StringBuilder();
-		for(String s : queryAttrs){
-			builder.append(s).append("&");
-		}
-		if (builder.length() > 0){
-			builder.delete(builder.length() - 1, builder.length());
-		}
-		coapOpt.setUriQuery(builder.toString());
-
 		// set request options
 		coapRequest.setOptions(coapOpt);
 
@@ -215,7 +198,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param coapResponse the Californium CoAP response message
 	 * @return the CoAPResponse message
 	 */
-	private CoAPResponseMessage getResponse(Response coapResponse) {
+	private CoAPResponseMessage getResponse(CoapResponse coapResponse) {
 
 		org.eclipse.californium.core.coap.CoAP.ResponseCode code = coapResponse.getCode();
 
@@ -233,7 +216,7 @@ public class AJObjectManagerApp implements Runnable {
 		options.setIfMatch(coapOpt.getIfMatch());
 		options.setIfNoneMatch(coapOpt.hasIfNoneMatch());
 		options.setSize1(coapOpt.getSize1());
-		
+
 		response.setOptions(options);
 
 		// copy the payload
@@ -249,7 +232,6 @@ public class AJObjectManagerApp implements Runnable {
 	 * <li>Connects the Object Manager to the AllJoyn Bus</li>
 	 * <li>Requests and advertises a well known name</li>
 	 * <li>Binds the session port</li>
-	 * <li>Starts the OM as a server to listen the requests from the AJ network</li>
 	 * </ul>
 	 */
 	public void start() {
