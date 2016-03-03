@@ -40,7 +40,7 @@ public class RDNodeResource extends CoapResource {
 		super(endpointID);		
 		this.endpointIdentifier = endpointID;
 		this.domain = domain;
-		
+
 	}
 
 	/**
@@ -187,30 +187,12 @@ public class RDNodeResource extends CoapResource {
 		// inform the AJ Object Manager Application about the resource removal
 		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
 		objectManager.removeResource(this.getEndpointIdentifier());
-		
+
 		ResourceDirectory.getInstance().removeContext(this.getEndpointIdentifier());
-		
+
 		delete();
-		
+
 		exchange.respond(ResponseCode.DELETED);
-	}
-
-	/**
-	 * Set either a new lifetime (for new resources, POST request) or update
-	 * the lifetime (for PUT request)
-	 * @param newLifeTime the new lifetime
-	 */
-	public void setLifeTime(int newLifeTime) {
-
-		lifeTime = newLifeTime;
-
-		if (lifetimeTimer != null) {
-			lifetimeTimer.cancel();
-		}
-
-		lifetimeTimer = new Timer();
-		lifetimeTimer.schedule(new ExpiryTask(this), lifeTime * 1000 + 2000);// from sec to ms
-
 	}
 
 	/**
@@ -246,7 +228,6 @@ public class RDNodeResource extends CoapResource {
 			}
 
 			CoapResource resource = addNodeResource(path);
-			resources.add(resource);
 
 			/*
 			 * Since created the subResource, get all the attributes from
@@ -264,6 +245,10 @@ public class RDNodeResource extends CoapResource {
 				else resource.getAttributes().addAttribute(attr.getName(), attr.getValue());
 			}
 			resource.getAttributes().addAttribute(LinkFormat.END_POINT, getEndpointIdentifier());
+
+			resources.add(resource);
+			ResourceDirectory.getInstance().addEntry(resource);
+
 		}
 		scanner.close();
 
@@ -325,30 +310,91 @@ public class RDNodeResource extends CoapResource {
 	 * Setter And Getter
 	 */
 
+	/**
+	 * Returns the Endpoint name <i>ep</i>.
+	 * This field is mandatory during registration.
+	 * @return the endpoint name
+	 */
 	public String getEndpointIdentifier() {
 		return endpointIdentifier;
 	}
 
+	/**
+	 * Returns the endpoint domain <i>d</i>.
+	 * This field is optional during registration.
+	 * If not specified, the domain is set to local.
+	 * @return the endpoint domain
+	 */
 	public String getDomain() {
 		return domain;
 	}
 
+	/**
+	 * Returns the Endpoint type <i>et</i>.
+	 * This field is optional during registration.
+	 * @return the endpoint type
+	 */
 	public String getEndpointType() {
 		return endpointType;
 	}
 
+	/**
+	 * Sets the Endpoint type to the specified value.
+	 * @param endpointType the endpoint type
+	 */
 	public void setEndpointType(String endpointType) {
 		this.endpointType = endpointType;
 	}
 
+	/**
+	 * Returns the Endpoint context <i>con</i>.
+	 * This field is optional during registration.
+	 * If not specified, the context is set to the source address and port.
+	 * @return the endpoint context
+	 */
 	public String getContext() {
 		return context;
 	}
 
+	/**
+	 * Sets the Endpoint context to the specified value.
+	 * @param context the endpoint context
+	 */
 	public void setContext(String context) {
 		this.context = context;
 	}
+	
+	/**
+	 * Returns the Endpoint lifetime <i>lt</i>.
+	 * This field is optional during registration.
+	 * If not specified, it is set to the default value 86400.
+	 * @return the endpoint lifetime
+	 */
+	public int getLifetime() {
+		return lifeTime;
+	}
+	
+	/**
+	 * Set either a new lifetime (for new resources, POST request) or update
+	 * the lifetime (for PUT request)
+	 * @param newLifeTime the new lifetime
+	 */
+	public void setLifeTime(int newLifeTime) {
 
+		lifeTime = newLifeTime;
+
+		if (lifetimeTimer != null) {
+			lifetimeTimer.cancel();
+		}
+
+		lifetimeTimer = new Timer();
+		lifetimeTimer.schedule(new ExpiryTask(this), lifeTime * 1000 + 2000);// from sec to ms
+
+	}
+
+	/**
+	 * The timer task. When the time expires, the resource is deleted.
+	 */
 	class ExpiryTask extends TimerTask {
 		RDNodeResource resource;
 
