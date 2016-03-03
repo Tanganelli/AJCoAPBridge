@@ -201,7 +201,7 @@ public class Options {
 
 	/**
 	 * Sets the Size1 option value.
-	 * @param size the size of the request body
+	 * @param size1 the size of the request body
 	 */
 	public void setSize1(Integer size1) {
 		this.size1 = size1;

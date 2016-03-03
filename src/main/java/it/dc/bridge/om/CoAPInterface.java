@@ -10,17 +10,17 @@ import org.alljoyn.bus.annotation.BusSignal;
  * the AllJoyn objects representing a CoAP resource.
  * It implements the following RESTful methods:
  * <ul>
- * <li> {@link #Get(CoAPRequestMessage,CoAPResponseMessage)} the GET method. </li>
- * <li> {@link #Post(CoAPRequestMessage,CoAPResponseMessage)} the POST method. </li>
- * <li> {@link #Delete(CoAPResponseMessage)} the DELETE method. </li>
+ * <li> {@link #get(CoAPRequestMessage,CoAPResponseMessage)} the GET method. </li>
+ * <li> {@link #post(CoAPRequestMessage,CoAPResponseMessage)} the POST method. </li>
+ * <li> {@link #delete(CoAPResponseMessage)} the DELETE method. </li>
  * </ul>
  * <p>
  * In addition to them, the interface implements the methods and the signal
  * for the observing service:
  * <ul>
- * <li> {@link #Registration()} registration to the resource observing service. </li>
- * <li> {@link #Cancellation()} cancellation from the resource observing service. </li>
- * <li> {@link #Notification(CoAPResponseMessage)} signal that represents a resource notification. </li>
+ * <li> {@link #registration()} registration to the resource observing service. </li>
+ * <li> {@link #cancellation()} cancellation from the resource observing service. </li>
+ * <li> {@link #notification(CoAPResponseMessage)} signal that represents a resource notification. </li>
  * </ul>
  * <p>
  * The signatures of the methods parameters reflect the attributes inside
