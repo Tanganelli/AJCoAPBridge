@@ -5,10 +5,13 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.EndpointManager;
 import org.eclipse.californium.core.network.config.NetworkConfig;
+
+import it.dc.bridge.om.AJObjectManagerApp;
 
 /**
  * The class <tt>ResourceDirectory</tt> provides a RD that implements
@@ -26,6 +29,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 
 	/* Map containing the identifier-context pair for each registered node */
 	private Map<String,String> contexts = new HashMap<String,String>();
+	private Map<String,String> resources = new HashMap<String,String>();
 	
 	/**
 	 * Instantiates a new Resource Directory.
@@ -74,9 +78,9 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 * @param path node identifier
 	 * @param context node context
 	 */
-	public void addContext(String path, String context) {
+	public void addContext(String nodeID, String context) {
 		
-		contexts.put(path, context);
+		contexts.put(nodeID, context);
 		
 	}
 	
@@ -87,9 +91,9 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 * @param path the node identifier
 	 * @return the node context, if present
 	 */
-	public String getContext(String path) {
+	public String getContext(String nodeID) {
 		
-		return contexts.get(path);
+		return contexts.get(nodeID);
 		
 	}
 	
@@ -98,9 +102,42 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 * 
 	 * @param path the node identifier
 	 */
-	public void removeContext(String path) {
+	public void removeContext(String nodeID) {
 		
-		contexts.remove(path);
+		contexts.remove(nodeID);
+		
+	}
+	
+	/**
+	 * Associates the specified resource with the specified node 
+	 * in the resource map.
+	 * Adds the node context if not present or updates it if was changed.
+	 * Then, the methods informs the <tt>AJObjectManagerApp</tt> about the
+	 * arrival of a new resource.
+	 * 
+	 * @param node the node resources
+	 * @param resource the new registered resource
+	 */
+	public void addEntry(RDNodeResource node, CoapResource resource) {
+		
+		resources.put(resource.getURI(), node.getEndpointIdentifier());
+		addContext(node.getEndpointIdentifier(), node.getContext());
+		
+		// inform the Object Manager about the new resource
+		AJObjectManagerApp.getInstance().addResource(resource.getURI());
+		
+	}
+	
+	public void printMaps() {
+		
+		System.out.println("Context map:");
+		for(Map.Entry<String,String> e : contexts.entrySet()) {
+			System.out.println(e.getKey()+" - "+e.getValue());
+		}
+		System.out.println("\nResource map:");
+		for(Map.Entry<String,String> e : resources.entrySet()) {
+			System.out.println(e.getKey()+" - "+e.getValue());
+		}
 		
 	}
 	

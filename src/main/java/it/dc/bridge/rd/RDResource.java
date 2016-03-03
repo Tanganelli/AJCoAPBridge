@@ -1,6 +1,5 @@
 package it.dc.bridge.rd;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.californium.core.CoapResource;
@@ -9,8 +8,6 @@ import org.eclipse.californium.core.coap.LinkFormat;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.tools.resources.LinkAttribute;
-
-import it.dc.bridge.om.AJObjectManagerApp;
 
 /**
  * The Class RDResource.
@@ -54,14 +51,8 @@ public class RDResource extends CoapResource {
 		String endpointType = "";
 
 		RDNodeResource resource = null; 
-		List<CoapResource> resources = new ArrayList<CoapResource>();
 
 		ResponseCode responseCode; 
-
-		for(Resource n : this.getChildren()) {
-			RDNodeResource r = (RDNodeResource)n;
-			System.out.println("ep:"+r.getEndpointIdentifier()+" et:"+r.getEndpointType()+" d:"+r.getDomain()+" lt:"+r.getLifetime());
-		}
 
 		LOGGER.info("Registration request: "+exchange.getSourceAddress()); 
 
@@ -117,7 +108,7 @@ public class RDResource extends CoapResource {
 		} 
 
 		// set parameters of the resource: {lt,con}
-		if (!resource.setParameters(exchange.advanced().getRequest(), resources)) { 
+		if (!resource.setParameters(exchange.advanced().getRequest())) { 
 			resource.delete(); 
 			exchange.respond(ResponseCode.BAD_REQUEST); 
 			return; 
@@ -127,17 +118,10 @@ public class RDResource extends CoapResource {
 
 		String location = resource.getURI();
 
-		if(!resources.isEmpty()){
-			// inform AJ Object Manager Application about the registration of a new resource
-			AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
-
-			for(CoapResource r : resources) {
-				objectManager.addResource(r.getURI());
-			}		
-		}
-
 		ResourceDirectory.getInstance().addContext(resource.getEndpointIdentifier(), resource.getContext());
 
+		ResourceDirectory.getInstance().printMaps();
+		
 		// inform client about the location of the new resource 
 		exchange.setLocationPath(location); 
 

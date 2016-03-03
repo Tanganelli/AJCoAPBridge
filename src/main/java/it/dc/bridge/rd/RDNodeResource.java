@@ -60,10 +60,9 @@ public class RDNodeResource extends CoapResource {
 	 * 
 	 * @param request A POST request with a {?lt,con} URI Template query
 	 * 			and a Link Format payload.
-	 * @param resources An empty CoapResource list in which new resources are inserted
 	 * @return the result of the resource update function
 	 */
-	public boolean setParameters(Request request, List<CoapResource> resources) {
+	public boolean setParameters(Request request) {
 
 		LinkAttribute attr;
 
@@ -107,7 +106,7 @@ public class RDNodeResource extends CoapResource {
 			return false;
 		}
 
-		return updateEndpointResources(request.getPayloadString(), resources);
+		return updateEndpointResources(request.getPayloadString());
 	}
 
 	/**
@@ -184,7 +183,7 @@ public class RDNodeResource extends CoapResource {
 
 		LOGGER.info("Updating endpoint: "+getContext());
 
-		setParameters(exchange.advanced().getRequest(), null);
+		setParameters(exchange.advanced().getRequest());
 
 		// complete the request
 		exchange.respond(ResponseCode.CHANGED);
@@ -222,9 +221,8 @@ public class RDNodeResource extends CoapResource {
 	 * register a resource for reading the temperature and another one
 	 * for reading the humidity.
 	 * @param linkFormat The registration payload
-	 * @param resources An empty list in which the new resources are inserted
 	 */
-	private boolean updateEndpointResources(String linkFormat, List<CoapResource> resources) {
+	private boolean updateEndpointResources(String linkFormat) {
 
 		Scanner scanner = new Scanner(linkFormat);
 
@@ -267,8 +265,7 @@ public class RDNodeResource extends CoapResource {
 			}
 			resource.getAttributes().addAttribute(LinkFormat.END_POINT, getEndpointIdentifier());
 
-			resources.add(resource);
-			ResourceDirectory.getInstance().addEntry(resource);
+			ResourceDirectory.getInstance().addEntry(this, resource);
 
 		}
 		scanner.close();
@@ -339,7 +336,7 @@ public class RDNodeResource extends CoapResource {
 	public String getEndpointIdentifier() {
 		return endpointIdentifier;
 	}
-	
+
 	/**
 	 * Returns the Endpoint name <i>ep</i>.
 	 * This field is mandatory during registration.
