@@ -39,13 +39,15 @@ public class RDNodeResource extends CoapResource {
 	private int lifeTime;
 
 	private String endpointIdentifier;
+	private String endpointName;
 	private String domain;
 	private String endpointType;
 	private String context;
 
-	public RDNodeResource(String endpointID, String domain) {
+	public RDNodeResource(String endpointID, String endpointName, String domain) {
 		super(endpointID);		
 		this.endpointIdentifier = endpointID;
+		this.endpointName = endpointName;
 		this.domain = domain;
 
 	}
@@ -330,12 +332,21 @@ public class RDNodeResource extends CoapResource {
 	 */
 
 	/**
+	 * Returns the Endpoint identifier.
+	 * This field is generated during registration.
+	 * @return the endpoint identifier
+	 */
+	public String getEndpointIdentifier() {
+		return endpointIdentifier;
+	}
+	
+	/**
 	 * Returns the Endpoint name <i>ep</i>.
 	 * This field is mandatory during registration.
 	 * @return the endpoint name
 	 */
-	public String getEndpointIdentifier() {
-		return endpointIdentifier;
+	public String getEndpointName() {
+		return endpointName;
 	}
 
 	/**

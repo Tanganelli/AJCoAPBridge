@@ -49,7 +49,7 @@ public class RDResource extends CoapResource {
 
 		// get name and lifetime from option query 
 		LinkAttribute attr; 
-		String endpointIdentifier = ""; 
+		String endpointName = "";
 		String domain = "local";
 		String endpointType = "";
 
@@ -71,7 +71,7 @@ public class RDResource extends CoapResource {
 			attr = LinkAttribute.parse(q); 
 
 			if (attr.getName().equals(LinkFormat.END_POINT)) { 
-				endpointIdentifier = attr.getValue(); 
+				endpointName = attr.getValue(); 
 			} 
 
 			if (attr.getName().equals(LinkFormat.DOMAIN)) { 
@@ -84,26 +84,29 @@ public class RDResource extends CoapResource {
 
 		} 
 
-		if (endpointIdentifier.equals("")) { 
+		// the endpoint name is mandatory during registration
+		if (endpointName.equals("")) { 
 			exchange.respond(ResponseCode.BAD_REQUEST, "Missing endpoint (?ep)"); 
 			LOGGER.info("Missing endpoint: "+exchange.getSourceAddress()); 
 			return; 
 		} 
 
+		// the endpoint name is an identifier that must be unique within a domain
 		for (Resource node : getChildren()) { 
-			if (((RDNodeResource) node).getEndpointIdentifier().equals(endpointIdentifier) && ((RDNodeResource) node).getDomain().equals(domain)) { 
+			if (((RDNodeResource) node).getEndpointName().equals(endpointName) && ((RDNodeResource) node).getDomain().equals(domain)) { 
 				resource = (RDNodeResource) node; 
 			} 
 		} 
 
 		if (resource==null) { 
 
+			// generate a random identifier for the resource
 			String randomName; 
 			do { 
 				randomName = Integer.toString((int) (Math.random() * 10000)); 
-			} while (getChild(randomName) != null); 
+			} while (getChild(randomName) != null);
 
-			resource = new RDNodeResource(endpointIdentifier, domain);
+			resource = new RDNodeResource(randomName, endpointName, domain);
 			resource.setEndpointType(endpointType);
 
 			add(resource);
