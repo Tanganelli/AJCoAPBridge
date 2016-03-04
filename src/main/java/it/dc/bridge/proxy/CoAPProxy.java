@@ -1,14 +1,18 @@
 package it.dc.bridge.proxy;
 
+import java.util.logging.Logger;
+
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.Request;
-import org.eclipse.californium.core.coap.Response;
 
 import it.dc.bridge.rd.ResourceDirectory;
 
 public class CoAPProxy implements Runnable {
 
+	/* the logger */
+	private static final Logger LOGGER = Logger.getGlobal();
+	
 	private static final CoAPProxy proxy = new CoAPProxy();
 	
 	/*
@@ -29,25 +33,30 @@ public class CoAPProxy implements Runnable {
 		
 	}
 	
-	public static Response callMethod(final String path, final Request request) {
+	/**
+	 * Obtains the context associated to the specific resource path and sends
+	 * a specific request message to the CoAP Server.
+	 * 
+	 * @param RDPath the resource path inside the RD
+	 * @param request the request message
+	 * @return the response message
+	 */
+	public static CoapResponse callMethod(final String RDPath, final Request request) {
 		
-		/*String node = ResourceDirectory.getInstance().getContext(null);
-		System.out.println("CoAP Server context:"+node);
-		CoapClient client = new CoapClient(node+"/.well-known/core");
+		// take the node context from the RD (the path is unique within the RD)
+		String context = ResourceDirectory.getInstance().getContextFromResource(RDPath);
+		
+		// take the resource path within the CoAP Server from the RD
+		String path = ResourceDirectory.getInstance().getResourcePath(RDPath);
+		
+		CoapClient client = new CoapClient(context+path);
 		
 		CoapResponse response = client.advanced(request);
-		if (response!=null) {
-
-			System.out.println(response.getCode());
-			System.out.println(response.getOptions());
-			System.out.println(response.getResponseText());
-
-		} else {
-			System.out.println("No response received.");
-		}*/
+		if (response==null) {
+			LOGGER.warning("No response received.");
+		}
 		
-		Response pippo = new Response(null);
-		return pippo;
+		return response;
 		
 	}
 	
