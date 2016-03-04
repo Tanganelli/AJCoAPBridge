@@ -1,6 +1,6 @@
 package it.dc.bridge.om;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.alljoyn.bus.annotation.Position;
@@ -21,8 +21,8 @@ public class Options {
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
 	@Position(1)
-	@Signature("a(ay)")
-	private List<byte[]> etag;
+	@Signature("aay")
+	private byte[][] etag;
 
 	/** Which Content-Format is acceptable to the client. */
 	@Position(2)
@@ -32,8 +32,8 @@ public class Options {
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
 	@Position(3)
-	@Signature("a(ay)")
-	private List<byte[]> ifMatch;
+	@Signature("aay")
+	private byte[][] ifMatch;
 
 	/** To make a request conditional on the nonexistence of the target resource. */
 	@Position(4)
@@ -49,12 +49,14 @@ public class Options {
 	 * Instantiates a new option set.
 	 */
 	public Options() {
+		
 		setContentFormat(null);
 		setEtag(null);
 		setAccept(null);
 		setIfMatch(null);
 		setIfNoneMatch(false);
 		setSize1(null);
+		
 	}
 
 	/**
@@ -63,12 +65,14 @@ public class Options {
 	 * @param origin the origin to be copied
 	 */
 	public Options(Options origin) {
+		
 		setContentFormat(origin.getContentFormat());
 		setEtag(origin.getEtag());
 		setAccept(origin.getAccept());
 		setIfMatch(origin.getIfMatch());
 		setIfNoneMatch(origin.getIfNoneMatch());
 		setSize1(origin.getSize1());
+		
 	}
 
 	/**
@@ -77,7 +81,9 @@ public class Options {
 	 * @return the ID as int or -1 if undefined
 	 */
 	public int getContentFormat() {
+		
 		return hasContentFormat() ? contentFormat : -1;
+		
 	}
 
 	/**
@@ -86,7 +92,9 @@ public class Options {
 	 * @return true if present
 	 */
 	public boolean hasContentFormat() {
+		
 		return contentFormat != null;
+		
 	}
 
 	/**
@@ -95,20 +103,23 @@ public class Options {
 	 * @param contentFormat the content format ID
 	 */
 	public void setContentFormat(Integer contentFormat) {
+		
 		this.contentFormat = contentFormat;
+		
 	}
 
-	/** Returns the list of ETags.
+	/**
+	 * Returns the list of ETags.
+	 * AllJoyn does not understand List type during marshalling,
+	 * so ETags are maintained into an array.
+	 * Instead, List is useful for Californium interoperation.
 	 * 
-	 * @return the ETag
+	 * @return the ETag as a list
 	 */
 	public List<byte[]> getEtag() {
-		if (etag == null)
-			synchronized (this) {
-				if (etag == null)
-					etag = new LinkedList<byte[]>();
-			}
-		return etag;
+		
+		return Arrays.asList(this.etag);
+		
 	}
 
 	/**
@@ -117,16 +128,28 @@ public class Options {
 	 * @return the count
 	 */
 	public int getETagCount() {
+		
 		return getEtag().size();
+		
 	}
 
 	/**
 	 * Sets the ETag.
+	 * AllJoyn does not understand List type during marshalling,
+	 * so ETags are maintained into an array.
+	 * Instead, List is useful for Californium interoperation.
 	 * 
-	 * @param etag ETag to set
+	 * @param etag list of ETag to set
 	 */
 	public void setEtag(List<byte[]> etag) {
-		this.etag = etag;
+		
+		if(etag == null){
+			this.etag = new byte[][]{};
+		}else {
+			this.etag = new byte[etag.size()][];
+			this.etag = etag.toArray(this.etag);
+		}
+		
 	}
 
 	/**
@@ -135,7 +158,9 @@ public class Options {
 	 * @return the ID as int or -1 if undefined
 	 */
 	public int getAccept() {
+		
 		return hasAccept() ? accept : -1;
+		
 	}
 
 	/**
@@ -144,7 +169,9 @@ public class Options {
 	 * @return true if present
 	 */
 	public boolean hasAccept() {
+		
 		return accept != null;
+		
 	}
 
 	/**
@@ -153,21 +180,23 @@ public class Options {
 	 * @param accept the Content-Format ID
 	 */
 	public void setAccept(Integer accept) {
+		
 		this.accept = accept;
+		
 	}
 
 	/**
 	 * Returns the If-Match ETag.
+	 * AllJoyn does not understand List type during marshalling,
+	 * so If-Match ETags are maintained into an array.
+	 * Instead, List is useful for Californium interoperation.
 	 * 
-	 * @return the If-Match ETag
+	 * @return the If-Match ETag as a list
 	 */
 	public List<byte[]> getIfMatch() {
-		if (ifMatch == null)
-			synchronized (this) {
-				if (ifMatch == null)
-					ifMatch = new LinkedList<byte[]>();
-			}
-		return ifMatch;
+		
+		return Arrays.asList(this.ifMatch);
+		
 	}
 
 	/**
@@ -176,16 +205,28 @@ public class Options {
 	 * @return the count
 	 */
 	public int getIfMatchCount() {
+		
 		return getIfMatch().size();
+		
 	}
 
 	/**
 	 * Sets the If-Match options to an ETag.
+	 * AllJoyn does not understand List type during marshalling,
+	 * so If-Match ETags are maintained into an array.
+	 * Instead, List is useful for Californium interoperation.
 	 * 
-	 * @param ifMatch the If-Match ETag to set
+	 * @param ifMatch the list of If-Match ETags to set
 	 */
 	public void setIfMatch(List<byte[]> ifMatch) {
-		this.ifMatch = ifMatch;
+
+		if(ifMatch == null){
+			this.ifMatch = new byte[][]{};
+		}else {
+			this.ifMatch = new byte[ifMatch.size()][];
+			this.ifMatch = ifMatch.toArray(this.ifMatch);
+		}
+		
 	}
 
 	/**
