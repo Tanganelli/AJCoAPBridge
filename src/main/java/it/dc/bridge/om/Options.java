@@ -17,34 +17,34 @@ public class Options {
 	@Position(0)
 	@Signature("i")
 	private Integer contentFormat;
-	
+
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
 	@Position(1)
 	@Signature("a(ay)")
 	private List<byte[]> etag;
-	
+
 	/** Which Content-Format is acceptable to the client. */
 	@Position(2)
 	@Signature("i")
 	private Integer accept;
-	
+
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
 	@Position(3)
 	@Signature("a(ay)")
 	private List<byte[]> ifMatch;
-	
+
 	/** To make a request conditional on the nonexistence of the target resource. */
 	@Position(4)
 	@Signature("b")
 	private boolean ifNoneMatch;
-	
+
 	/** Size information about the resource representation. */
 	@Position(5)
 	@Signature("i")
 	private Integer size1;
-	
+
 	/**
 	 * Instantiates a new option set.
 	 */
@@ -56,9 +56,10 @@ public class Options {
 		setIfNoneMatch(false);
 		setSize1(null);
 	}
-	
+
 	/**
 	 * Instantiates a new option set equal to the specified one by deep-copying it.
+	 * 
 	 * @param origin the origin to be copied
 	 */
 	public Options(Options origin) {
@@ -72,14 +73,16 @@ public class Options {
 
 	/**
 	 * Returns the Content-Format Identifier of the Content-Format option.
+	 * 
 	 * @return the ID as int or -1 if undefined
 	 */
 	public int getContentFormat() {
 		return hasContentFormat() ? contentFormat : -1;
 	}
-	
+
 	/**
 	 * Checks if the Content-Format option is present.
+	 * 
 	 * @return true if present
 	 */
 	public boolean hasContentFormat() {
@@ -88,6 +91,7 @@ public class Options {
 
 	/**
 	 * Sets the Content-Format ID of the Content-Format option.
+	 * 
 	 * @param contentFormat the content format ID
 	 */
 	public void setContentFormat(Integer contentFormat) {
@@ -95,6 +99,7 @@ public class Options {
 	}
 
 	/** Returns the list of ETags.
+	 * 
 	 * @return the ETag
 	 */
 	public List<byte[]> getEtag() {
@@ -105,9 +110,10 @@ public class Options {
 			}
 		return etag;
 	}
-	
+
 	/**
 	 * Returns the number of ETag options.
+	 * 
 	 * @return the count
 	 */
 	public int getETagCount() {
@@ -116,6 +122,7 @@ public class Options {
 
 	/**
 	 * Sets the ETag.
+	 * 
 	 * @param etag ETag to set
 	 */
 	public void setEtag(List<byte[]> etag) {
@@ -124,14 +131,16 @@ public class Options {
 
 	/**
 	 * Returns the Content-Format Identifier of the Accept option.
+	 * 
 	 * @return the ID as int or -1 if undefined
 	 */
 	public int getAccept() {
 		return hasAccept() ? accept : -1;
 	}
-	
+
 	/**
 	 * Checks if the Accept option is present.
+	 * 
 	 * @return true if present
 	 */
 	public boolean hasAccept() {
@@ -140,6 +149,7 @@ public class Options {
 
 	/**
 	 * Sets the Content-Format ID of the Accept option.
+	 * 
 	 * @param accept the Content-Format ID
 	 */
 	public void setAccept(Integer accept) {
@@ -148,6 +158,7 @@ public class Options {
 
 	/**
 	 * Returns the If-Match ETag.
+	 * 
 	 * @return the If-Match ETag
 	 */
 	public List<byte[]> getIfMatch() {
@@ -158,9 +169,10 @@ public class Options {
 			}
 		return ifMatch;
 	}
-	
+
 	/**
 	 * Returns the number of If-Match options.
+	 * 
 	 * @return the count
 	 */
 	public int getIfMatchCount() {
@@ -169,6 +181,7 @@ public class Options {
 
 	/**
 	 * Sets the If-Match options to an ETag.
+	 * 
 	 * @param ifMatch the If-Match ETag to set
 	 */
 	public void setIfMatch(List<byte[]> ifMatch) {
@@ -177,6 +190,7 @@ public class Options {
 
 	/**
 	 * Checks if the If-None-Match option is present.
+	 * 
 	 * @return true if present
 	 */
 	public boolean getIfNoneMatch() {
@@ -185,6 +199,7 @@ public class Options {
 
 	/**
 	 * Sets or unsets the If-None-Match option.
+	 * 
 	 * @param ifNoneMatch the presence of the option
 	 */
 	public void setIfNoneMatch(Boolean ifNoneMatch) {
@@ -193,6 +208,7 @@ public class Options {
 
 	/**
 	 * Returns the uint value of the Size1 option.
+	 * 
 	 * @return the Size1 value or null if the option is not present
 	 */
 	public Integer getSize1() {
@@ -201,6 +217,7 @@ public class Options {
 
 	/**
 	 * Sets the Size1 option value.
+	 * 
 	 * @param size1 the size of the request body
 	 */
 	public void setSize1(Integer size1) {

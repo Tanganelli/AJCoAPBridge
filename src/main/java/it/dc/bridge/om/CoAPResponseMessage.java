@@ -22,13 +22,15 @@ public interface CoAPResponseMessage {
 
 	/**
 	 * Returns the response code of the message.
+	 * 
 	 * @return the response code
 	 * @see CoAP
 	 */
 	public CoAP.ResponseCode getCode();
-	
+
 	/**
 	 * Sets the message response code.
+	 * 
 	 * @param code the response code
 	 * @see CoAP
 	 */
@@ -36,13 +38,15 @@ public interface CoAPResponseMessage {
 
 	/**
 	 * Returns a class containing the option fields.
+	 * 
 	 * @see Options
 	 * @return the option fields
 	 */
 	public Options getOptions();
-	
+
 	/**
 	 * Sets the options fields.
+	 * 
 	 * @see Options
 	 * @param options Options class containing the option fields.
 	 */
@@ -54,7 +58,7 @@ public interface CoAPResponseMessage {
 	 * @return the payload
 	 */
 	public byte[] getPayload();
-	
+
 	/**
 	 * Gets the payload in the form of a string. Returns an empty string if no
 	 * payload is defined.
@@ -62,14 +66,14 @@ public interface CoAPResponseMessage {
 	 * @return the payload as string
 	 */
 	public String getPayloadString();
-	
+
 	/**
 	 * Sets the payload from raw data.
 	 *
 	 * @param payload the raw payload
 	 */
 	public void setPayload(byte[] payload);
-	
+
 	/**
 	 * Sets the UTF-8 bytes from the specified string as payload.
 	 * 

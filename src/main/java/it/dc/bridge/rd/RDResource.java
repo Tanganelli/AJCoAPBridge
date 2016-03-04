@@ -10,7 +10,9 @@ import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.tools.resources.LinkAttribute;
 
 /**
- * The Class RDResource.
+ * The Class <tt>RDResource</tt> is the root resource of all the
+ * resources that will be registered. Its path within the Resource
+ * Directory is <i>/rd</i>.
  */
 public class RDResource extends CoapResource { 
 

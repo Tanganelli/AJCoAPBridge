@@ -22,41 +22,41 @@ import it.dc.bridge.om.CoAP.RequestCode;
  * @see CoAPInterface
  */
 public class CoAPResource implements CoAPInterface, BusObject{
-	
+
 	/** The object path. */
 	private String objectPath;
-	
+
 	/**
 	 * Instantiates a new CoAP resource with an object path.
 	 *
 	 * @param path the object path
 	 */
 	public CoAPResource(String path) {
-		
+
 		this.objectPath = path;
-		
+
 	}
-	
+
 	/**
 	 * Gets the object path.
 	 *
 	 * @return the object path
 	 */
 	public String getPath() {
-		
+
 		return objectPath;
-		
+
 	}
-	
+
 	/**
 	 * Sets the object path.
 	 *
 	 * @param path the new object path
 	 */
 	public void setPath(String path) {
-		
+
 		this.objectPath = path;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -73,7 +73,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public void post(final CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
 
 		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.POST, request, response);
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -82,7 +82,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public void delete(CoAPResponseMessage response) throws BusException {
 
 		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null, response);
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -90,7 +90,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 */
 	public void registration() throws BusException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -98,7 +98,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 */
 	public void cancellation() throws BusException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -106,7 +106,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 */
 	public void notification(CoAPResponseMessage message) throws BusException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

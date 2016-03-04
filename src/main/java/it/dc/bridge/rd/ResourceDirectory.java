@@ -24,17 +24,20 @@ import it.dc.bridge.om.AJObjectManagerApp;
  */ 
 public class ResourceDirectory extends CoapServer implements Runnable {
 
+	/* the class instance */
 	private static final ResourceDirectory resourceDirectory = new ResourceDirectory();
+
+	/* CoAP default port */
 	private static final int COAP_PORT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.COAP_PORT);
 
-	/* Map containing the identifier-context pair for each registered node */
+	/* Map containing the <identifier, context> pair for each registered node */
 	private Map<String, String> contexts = new ConcurrentHashMap<String, String>();
-	/* Map containing the resource-node pair for each registered resource */
+	/* Map containing the <resource, node> pair for each registered resource */
 	private Map<String, String> resources = new ConcurrentHashMap<String, String>();
-	/* Map containing the resource-path pair for each registered resource */
+	/* Map containing the <resource, path> pair for each registered resource */
 	private Map<String, String> paths = new ConcurrentHashMap<String, String>();
 
-	/**
+	/*
 	 * Instantiates a new Resource Directory and adds to it the <i>/rd</i> resource.
 	 * Since it is a Singleton, the constructor is private.
 	 */
@@ -99,7 +102,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		return contexts.get(nodeID);
 
 	}
-	
+
 	/**
 	 * Returns the node context starting from a specified resource path.
 	 * 
@@ -107,11 +110,11 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 * @return the node context
 	 */
 	public synchronized String getContextFromResource(String resource) {
-		
+
 		String node = resources.get(resource);
-		
+
 		return getContext(node);
-		
+
 	}
 
 	/**
@@ -131,23 +134,25 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 * Associates the specified resource with the specified node 
 	 * in the resource map.
 	 * Adds the node context if not present or updates it if was changed.
-	 * Then, the methods informs the <tt>AJObjectManagerApp</tt> about the
+	 * Then, the methods informs the {@link AJObjectManagerApp} about the
 	 * arrival of a new resource.
 	 * 
 	 * @param node the node resources
 	 * @param resource the new registered resource
 	 */
 	public synchronized void addEntry(RDNodeResource node, CoapResource resource) {
-		
+
 		// TODO store the entry in the database, if implemented
 
 		// put the <resource, node> and <node, context> pairs to the hash maps
 		resources.put(resource.getURI(), node.getEndpointIdentifier());
 		addNode(node.getEndpointIdentifier(), node.getContext());
-		
-		// put the <uri, path> pair to the hash map:
-		// the uri is the resource path within the RD;
-		// the path is the resource path within the node
+
+		/* 
+		 * put the <uri, path> pair to the hash map:
+		 * the uri is the resource path within the RD;
+		 * the path is the resource path within the node
+		 */
 		String path = resource.getURI().substring(node.getURI().length());
 		paths.put(resource.getURI(), path);
 
@@ -158,7 +163,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 
 	/**
 	 * Removes the mapping for the resources with a specific associated node.
-	 * For each removed resource, the method informs the Object Manager about
+	 * For each removed resource, the method informs the {@link AJObjectManagerApp} about
 	 * the resource removal.
 	 * 
 	 * @param nodeID the node identifier
@@ -166,22 +171,29 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	public synchronized void removeEntries(String nodeID) {
 
 		//TODO delete entries from the database, if implemented
-		
+
 		for(Map.Entry<String, String> e : resources.entrySet()) {
 			if(e.getValue().equals(nodeID)) {
 				resources.remove(e.getKey());
 				paths.remove(e.getKey());
-				
+
 				// inform the Object Manager about the resource removal
 				AJObjectManagerApp.getInstance().removeResource(e.getKey());
 			}
 		}
 	}
-	
+
+	/**
+	 * Returns the resource path within its parent node starting
+	 * from the resource path within the <tt>ResourceDirectory</tt>.
+	 * 
+	 * @param path the resource uri
+	 * @return the resource path
+	 */
 	public synchronized String getResourcePath(String path) {
-		
+
 		return paths.get(path);
-		
+
 	}
 
 	/**

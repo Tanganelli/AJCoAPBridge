@@ -26,26 +26,38 @@ import it.dc.bridge.proxy.CoAPProxy;
  * the CoAP resources to the AJ network. It takes new
  * resource registrations and registers AJ objects representing
  * that resources.
+ * <p>
+ * The class also deals with the method calls:
+ * it receives calls from the AllJoyn network and then sends the
+ * method call as a <tt>CoapRequest</tt> to the CoAP Server.
  */
 public class AJObjectManagerApp implements Runnable {
 
 	static {
+		// load the AllJoyn library
 		System.loadLibrary("alljoyn_java");
 	}
 
 	private static final short CONTACT_PORT=42;
 
+	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
 
+	/* the class instance */
 	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
 
+	/* map containing the <object path, AJ object> pair for each registered object */
 	private static Map<String,CoAPResource> resources = new ConcurrentHashMap<String,CoAPResource>();
+
+	/* a connection to the message bus */
 	private static BusAttachment mBus;
 
 	/*
 	 * Since the class is a singleton, the constructor must be private
 	 */
-	private AJObjectManagerApp() {}
+	private AJObjectManagerApp() {
+
+	}
 
 	/**
 	 * The AJ Object Manager is a Singleton.
@@ -60,7 +72,7 @@ public class AJObjectManagerApp implements Runnable {
 	}
 
 	/**
-	 * Creates a new AllJoyn CoAPResource and registers it
+	 * Creates a new AllJoyn {@link CoAPResource} and registers it
 	 * to the AllJoyn Bus.
 	 * 
 	 * @param objectPath the object path
@@ -81,7 +93,7 @@ public class AJObjectManagerApp implements Runnable {
 	}
 
 	/**
-	 * Removes and unregisters an AllJoyn CoAP resource.
+	 * Removes and unregisters an AllJoyn {@link CoAPResource}.
 	 * 
 	 * @param objectPath location of the resource
 	 */
@@ -113,6 +125,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * the {@link CoAPRequestMessage} interface.
 	 * The method call response from the Proxy is a Californium <tt>Response</tt>.
 	 * This method translates the response message into a {@link CoAPResponseMessage}.
+	 * 
 	 * @param path the URI path
 	 * @param code the request code
 	 * @param request a message implementing the request interface
@@ -184,6 +197,7 @@ public class AJObjectManagerApp implements Runnable {
 			}
 			coapOpt.setUriQuery(builder.toString());
 		}
+
 		// set request options
 		coapRequest.setOptions(coapOpt);
 

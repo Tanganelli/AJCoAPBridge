@@ -11,7 +11,7 @@ public class CoAP {
 
 	/**  The CoAP charset is always UTF-8. */
 	public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
-	
+
 	/**
 	 * The enumeration of request codes: GET, POST; PUT and DELETE.
 	 */

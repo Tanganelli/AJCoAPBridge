@@ -25,6 +25,7 @@ import org.eclipse.californium.tools.resources.LinkAttribute;
  */
 public class RDNodeResource extends CoapResource {
 
+	/* the logger */
 	private static final Logger LOGGER = Logger.getLogger(RDNodeResource.class.getCanonicalName());
 
 	/*
@@ -34,8 +35,8 @@ public class RDNodeResource extends CoapResource {
 	 */
 	private Timer lifetimeTimer;
 
+	/* node parameters */
 	private int lifeTime;
-
 	private String endpointIdentifier;
 	private String endpointName;
 	private String domain;
@@ -67,9 +68,7 @@ public class RDNodeResource extends CoapResource {
 		int newLifeTime = 86400;
 		String newContext = "";
 
-		/*
-		 * get lifetime from option query - only for PUT request.
-		 */
+		//get lifetime from option query - only for PUT request.
 		List<String> query = request.getOptions().getUriQuery();
 		for (String q : query) {
 
@@ -196,7 +195,7 @@ public class RDNodeResource extends CoapResource {
 	}
 
 	/**
-	 * Handles the DELETE request in the given CoAPExchange.
+	 * Handles the DELETE request in the given <tt>CoAPExchange</tt>.
 	 * DELETEs this node resource.
 	 * The response code to a DELETE request should be a Deleted (2.02).
 	 */
@@ -213,6 +212,7 @@ public class RDNodeResource extends CoapResource {
 	 * register. Each resource is separated by ",". E.g. A node can
 	 * register a resource for reading the temperature and another one
 	 * for reading the humidity.
+	 * 
 	 * @param linkFormat The registration payload
 	 */
 	private boolean updateEndpointResources(String linkFormat) {
@@ -315,8 +315,6 @@ public class RDNodeResource extends CoapResource {
 		}
 	}
 
-
-
 	/*
 	 * Setter And Getter
 	 */
@@ -324,6 +322,7 @@ public class RDNodeResource extends CoapResource {
 	/**
 	 * Returns the Endpoint identifier.
 	 * This field is generated during registration.
+	 * 
 	 * @return the endpoint identifier
 	 */
 	public String getEndpointIdentifier() {
@@ -333,6 +332,7 @@ public class RDNodeResource extends CoapResource {
 	/**
 	 * Returns the Endpoint name <i>ep</i>.
 	 * This field is mandatory during registration.
+	 * 
 	 * @return the endpoint name
 	 */
 	public String getEndpointName() {
@@ -343,6 +343,7 @@ public class RDNodeResource extends CoapResource {
 	 * Returns the endpoint domain <i>d</i>.
 	 * This field is optional during registration.
 	 * If not specified, the domain is set to local.
+	 * 
 	 * @return the endpoint domain
 	 */
 	public String getDomain() {
@@ -352,6 +353,7 @@ public class RDNodeResource extends CoapResource {
 	/**
 	 * Returns the Endpoint type <i>et</i>.
 	 * This field is optional during registration.
+	 * 
 	 * @return the endpoint type
 	 */
 	public String getEndpointType() {
@@ -360,6 +362,7 @@ public class RDNodeResource extends CoapResource {
 
 	/**
 	 * Sets the Endpoint type to the specified value.
+	 * 
 	 * @param endpointType the endpoint type
 	 */
 	public void setEndpointType(String endpointType) {
@@ -370,6 +373,7 @@ public class RDNodeResource extends CoapResource {
 	 * Returns the Endpoint context <i>con</i>.
 	 * This field is optional during registration.
 	 * If not specified, the context is set to the source address and port.
+	 * 
 	 * @return the endpoint context
 	 */
 	public String getContext() {
@@ -378,6 +382,7 @@ public class RDNodeResource extends CoapResource {
 
 	/**
 	 * Sets the Endpoint context to the specified value.
+	 * 
 	 * @param context the endpoint context
 	 */
 	public void setContext(String context) {
@@ -388,6 +393,7 @@ public class RDNodeResource extends CoapResource {
 	 * Returns the Endpoint lifetime <i>lt</i>.
 	 * This field is optional during registration.
 	 * If not specified, it is set to the default value 86400.
+	 * 
 	 * @return the endpoint lifetime
 	 */
 	public int getLifetime() {
@@ -396,7 +402,8 @@ public class RDNodeResource extends CoapResource {
 
 	/**
 	 * Set either a new lifetime (for new resources, POST request) or update
-	 * the lifetime (for PUT request)
+	 * the lifetime (for PUT request).
+	 * 
 	 * @param newLifeTime the new lifetime
 	 */
 	public void setLifeTime(int newLifeTime) {

@@ -24,18 +24,20 @@ public interface CoAPRequestMessage {
 
 	/**
 	 * Returns a class containing the option fields.
+	 * 
 	 * @see Options
 	 * @return the option fields
 	 */
 	public Options getOptions();
-	
+
 	/**
 	 * Sets the options fields.
+	 * 
 	 * @see Options
 	 * @param options Options class containing the option fields.
 	 */
 	public void setOptions(Options options);
-	
+
 	/**
 	 * The query attributes are used to perform query filtering.
 	 * The query serves to further parameterize the resource.
@@ -45,23 +47,25 @@ public interface CoAPRequestMessage {
 	 * the Bridge composes the URI from them, and then it sends the message to the CoAP Server.
 	 * <p>
 	 * This method get the query attributes of a request message.
+	 * 
 	 * @return a dictionary of key-value pairs
 	 */
 	public Map<String,String> getAttributes();
-	
+
 	/**
 	 * Sets the query attributes of a requet message.
+	 * 
 	 * @param attributes dictionary of key-value pairs
 	 */
 	public void setAttributes(Map<String,String> attributes);
-	
+
 	/**
 	 * Gets the raw payload.
 	 *
 	 * @return the payload
 	 */
 	public byte[] getPayload();
-	
+
 	/**
 	 * Gets the payload in the form of a string. Returns an empty string if no
 	 * payload is defined.
@@ -69,19 +73,19 @@ public interface CoAPRequestMessage {
 	 * @return the payload as string
 	 */
 	public String getPayloadString();
-	
+
 	/**
 	 * Sets the payload from raw data.
 	 *
 	 * @param payload the raw payload
 	 */
 	public void setPayload(byte[] payload);
-	
+
 	/**
 	 * Sets the UTF-8 bytes from the specified string as payload.
 	 * 
 	 * @param payload the payload as sting
 	 */
 	public void setPayload(String payload);
-	
+
 }

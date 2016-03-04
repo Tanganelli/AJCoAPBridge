@@ -25,6 +25,7 @@ import org.alljoyn.bus.annotation.BusSignal;
  * <p>
  * The signatures of the methods parameters reflect the attributes inside
  * the {@link RequestMessage} and the {@link ResponseMessage} classes.
+ * 
  * @see CoAPRequestMessage
  * @see CoAPResponseMessage
  * @see RequestMessage

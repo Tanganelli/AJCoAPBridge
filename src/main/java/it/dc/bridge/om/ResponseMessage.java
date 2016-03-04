@@ -19,35 +19,35 @@ public class ResponseMessage implements CoAPResponseMessage{
 	@Position(0)
 	@Signature("i")
 	ResponseCode code;
-	
+
 	/** The opt. */
 	@Position(1)
 	@Signature("r")
 	Options options;
-	
+
 	/** The payload. */
 	@Position(2)
 	@Signature("ay")
 	byte[] payload;
-	
+
 	/**
 	 * Instantiates a new response with the specified response code.
 	 *
 	 * @param code the response code
 	 */
 	public ResponseMessage(ResponseCode code) {
-		
+
 		this.code = code;
-		
+
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPResponseMessage#getCode()
 	 */
 	public ResponseCode getCode() {
 
 		return this.code;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +56,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public void setCode(ResponseCode code) {
 
 		this.code = code;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -65,7 +65,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public Options getOptions() {
 
 		return this.options;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +74,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public void setOptions(Options options) {
 
 		this.options = options;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -83,7 +83,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public byte[] getPayload() {
 
 		return this.payload;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -94,7 +94,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 		if (payload==null)
 			return "";
 		return new String(payload, CoAP.UTF8_CHARSET);
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -103,7 +103,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public void setPayload(byte[] payload) {
 
 		this.payload = payload;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -116,7 +116,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 		} else {
 			setPayload(payload.getBytes(CoAP.UTF8_CHARSET));
 		}
-		
+
 	}
 
 }

@@ -8,18 +8,28 @@ import org.eclipse.californium.core.coap.Request;
 
 import it.dc.bridge.rd.ResourceDirectory;
 
+/**
+ * The <tt>CoAPProxy</tt> class receives method calls from
+ * the {@link AJObjectManagerApp} and sends the specific request
+ * messages to the CoAP Server. It interacts also with the {@link ResourceDirectory}
+ * in order to know the CoAP Server information (i.e., the resource path,
+ * the node IP address, the node port).
+ */
 public class CoAPProxy implements Runnable {
 
 	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
 	
+	/* the class instance */
 	private static final CoAPProxy proxy = new CoAPProxy();
 	
 	/*
 	 * Since the CoAPProxy is a singleton,
 	 * the constructor must be private.
 	 */
-	private CoAPProxy() {}
+	private CoAPProxy() {
+		
+	}
 	
 	/**
 	 * The CoAP Proxy is a Singleton.
