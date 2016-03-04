@@ -28,11 +28,14 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	private static final int COAP_PORT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.COAP_PORT);
 
 	/* Map containing the identifier-context pair for each registered node */
-	private Map<String, String> contexts = new ConcurrentHashMap<String,String>();
-	private Map<String,String> resources = new ConcurrentHashMap<String,String>();
+	private Map<String, String> contexts = new ConcurrentHashMap<String, String>();
+	/* Map containing the resource-node pair for each registered resource */
+	private Map<String, String> resources = new ConcurrentHashMap<String, String>();
+	/* Map containing the resource-path pair for each registered resource */
+	private Map<String, String> paths = new ConcurrentHashMap<String, String>();
 
 	/**
-	 * Instantiates a new Resource Directory.
+	 * Instantiates a new Resource Directory and adds to it the <i>/rd</i> resource.
 	 * Since it is a Singleton, the constructor is private.
 	 */
 	private ResourceDirectory() {
@@ -96,6 +99,20 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		return contexts.get(nodeID);
 
 	}
+	
+	/**
+	 * Returns the node context starting from a specified resource path.
+	 * 
+	 * @param resource the resource path
+	 * @return the node context
+	 */
+	public synchronized String getContextFromResource(String resource) {
+		
+		String node = resources.get(resource);
+		
+		return getContext(node);
+		
+	}
 
 	/**
 	 * Removes the mapping for a node identifier from this map if it is present.
@@ -124,8 +141,15 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		
 		// TODO store the entry in the database, if implemented
 
+		// put the <resource, node> and <node, context> pairs to the hash maps
 		resources.put(resource.getURI(), node.getEndpointIdentifier());
 		addNode(node.getEndpointIdentifier(), node.getContext());
+		
+		// put the <uri, path> pair to the hash map:
+		// the uri is the resource path within the RD;
+		// the path is the resource path within the node
+		String path = resource.getURI().substring(node.getURI().length());
+		paths.put(resource.getURI(), path);
 
 		// inform the Object Manager about the new resource
 		AJObjectManagerApp.getInstance().addResource(resource.getURI());
@@ -146,11 +170,18 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		for(Map.Entry<String, String> e : resources.entrySet()) {
 			if(e.getValue().equals(nodeID)) {
 				resources.remove(e.getKey());
+				paths.remove(e.getKey());
 				
 				// inform the Object Manager about the resource removal
 				AJObjectManagerApp.getInstance().removeResource(e.getKey());
 			}
 		}
+	}
+	
+	public synchronized String getResourcePath(String path) {
+		
+		return paths.get(path);
+		
 	}
 
 	/**
