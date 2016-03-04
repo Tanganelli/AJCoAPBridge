@@ -10,7 +10,7 @@ import it.dc.bridge.rd.ResourceDirectory;
 
 /**
  * The <tt>CoAPProxy</tt> class receives method calls from
- * the {@link AJObjectManagerApp} and sends the specific request
+ * the <tt>AJObjectManagerApp</tt> and sends the specific request
  * messages to the CoAP Server. It interacts also with the {@link ResourceDirectory}
  * in order to know the CoAP Server information (i.e., the resource path,
  * the node IP address, the node port).
