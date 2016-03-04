@@ -28,7 +28,7 @@ public class RequestMessage implements CoAPRequestMessage{
 	/** The message payload. */
 	@Position(2)
 	@Signature("ay")
-	private byte[] payload;
+	private byte[] payload = {};
 
 	/**
 	 * Instantiates a new request message.
@@ -37,12 +37,11 @@ public class RequestMessage implements CoAPRequestMessage{
 
 		options = new Options();
 		attributes = new HashMap<String, String>();
-		payload = null;
 
 	}
 
 	/**
-	 * Instantiates a new option set equal to the specified message parameters.
+	 * Instantiates a new request message equal to the specified message parameters.
 	 * 
 	 * @param options the option set
 	 * @param attributes the query attributes
@@ -70,7 +69,7 @@ public class RequestMessage implements CoAPRequestMessage{
 	 */
 	public void setOptions(Options options) {
 
-		this.options = options;
+		this.options = new Options(options);
 
 	}
 

@@ -28,8 +28,17 @@ public class ResponseMessage implements CoAPResponseMessage{
 	/** The payload. */
 	@Position(2)
 	@Signature("ay")
-	byte[] payload;
+	byte[] payload = {};
 
+	/**
+	 * Instantiates a new response message.
+	 */
+	public ResponseMessage() {
+
+		this.options = new Options();
+
+	}
+	
 	/**
 	 * Instantiates a new response with the specified response code.
 	 *
@@ -38,6 +47,15 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public ResponseMessage(ResponseCode code) {
 
 		this.code = code;
+		this.options = new Options();
+
+	}
+	
+	public ResponseMessage(ResponseCode code, Options options, byte[] payload) {
+
+		this.code = code;
+		this.options = new Options(options);
+		this.payload = payload;
 
 	}
 
