@@ -87,6 +87,8 @@ public class AJObjectManagerApp implements Runnable {
 
 			return;
 		}
+		
+		LOGGER.info("Registered bus object: "+objectPath);
 
 		resources.put(objectPath, resource);
 
@@ -217,7 +219,7 @@ public class AJObjectManagerApp implements Runnable {
 		org.eclipse.californium.core.coap.CoAP.ResponseCode code = coapResponse.getCode();
 
 		// create the response
-		ResponseMessage response = new ResponseMessage(ResponseCode.valueOf(code.value));
+		CoAPResponseMessage response = new ResponseMessage(ResponseCode.valueOf(code.value));
 
 		// copy the options
 		OptionSet coapOpt = coapResponse.getOptions();
