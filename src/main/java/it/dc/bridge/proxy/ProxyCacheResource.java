@@ -356,7 +356,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			
 			// Implementation in new Cf (Only one accept option allowed)
 			Integer accept = request.getOptions().getAccept();
-			if (accept != null) {
+			if (accept != MediaTypeRegistry.UNDEFINED) {
 				int mediaType = accept.intValue();
 				CacheKey cacheKey = new CacheKey(proxyUri, mediaType, payload);
 				cacheKeys.add(cacheKey);
@@ -392,7 +392,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 
 			String proxyUri = request.getOptions().getProxyUri();
 			Integer mediaType = response.getOptions().getContentFormat();
-			if (mediaType == null) 
+			if (mediaType == MediaTypeRegistry.UNDEFINED) 
 				mediaType = MediaTypeRegistry.TEXT_PLAIN;
 			byte[] payload = request.getPayload();
 
