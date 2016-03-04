@@ -26,6 +26,12 @@
 			<artifactId>cf-rd</artifactId>
 			<version>1.0.0-M3</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>15.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
