@@ -8,6 +8,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.InetAddressValidator;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.LinkFormat;
 import org.eclipse.californium.core.coap.Request;
@@ -84,7 +87,7 @@ public class RDNodeResource extends CoapResource {
 			}
 
 			if (attr.getName().equals(LinkFormat.CONTEXT)){
-				newContext = attr.getValue();
+				newContext = parseContext(q);
 			}
 		}
 
@@ -104,6 +107,49 @@ public class RDNodeResource extends CoapResource {
 		}
 
 		return updateEndpointResources(request.getPayloadString());
+	}
+
+	/**
+	 * Starting from a query string, the method returns the context if the
+	 * attribute value is a valid url or a valid IP address, an empty string otherwise.
+	 * 
+	 * @param query the <attribute=value> pair
+	 * @return the node context, if valid
+	 */
+	private String parseContext(String query) {
+
+		if (query.split("=").length < 2) {
+			LOGGER.warning("Bad context: default context will be use");
+			return "";
+		}
+
+		String context = query.split("=")[1];
+
+
+		// check if the context is a valid url
+		String[] schemes = {"coap", "coaps"};
+		UrlValidator urlValidator = new UrlValidator(schemes);
+		if(urlValidator.isValid(context)) {
+			return context;
+		}
+
+		if (context.split(":").length < 2) {
+			LOGGER.warning("Bad context: default context will be use");
+			return "";
+		}
+
+		// check if the context is a valid ip address:port
+		String ip = context.split(":")[0];
+		String port = context.split(":")[1];
+		InetAddressValidator inetValidator = new InetAddressValidator();
+		if(inetValidator.isValid(ip) && StringUtils.isNumeric(port)) {
+			return context;
+		}
+
+		// TODO validate IPv6 addresses
+		
+		return "";
+
 	}
 
 	/**
