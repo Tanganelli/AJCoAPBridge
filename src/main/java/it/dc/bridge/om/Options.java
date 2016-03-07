@@ -182,7 +182,7 @@ public class Options {
 	 */
 	public void setAccept(Integer accept) {
 		
-		this.accept = accept;
+		this.accept = (accept != null) ? accept : -1;
 		
 	}
 
@@ -237,7 +237,9 @@ public class Options {
 	 * @return true if present
 	 */
 	public boolean getIfNoneMatch() {
+		
 		return ifNoneMatch;
+		
 	}
 
 	/**
@@ -246,7 +248,9 @@ public class Options {
 	 * @param ifNoneMatch the presence of the option
 	 */
 	public void setIfNoneMatch(Boolean ifNoneMatch) {
+		
 		this.ifNoneMatch = ifNoneMatch;
+		
 	}
 
 	/**
@@ -255,7 +259,9 @@ public class Options {
 	 * @return the Size1 value or null if the option is not present
 	 */
 	public Integer getSize1() {
-		return size1;
+		
+		return (size1 > -1) ? size1 : null;
+		
 	}
 
 	/**
@@ -264,7 +270,9 @@ public class Options {
 	 * @param size1 the size of the request body
 	 */
 	public void setSize1(Integer size1) {
-		this.size1 = size1;
+		
+		this.size1 = (size1 != null) ? size1 : -1;
+		
 	}
 
 }
