@@ -44,8 +44,8 @@ public interface CoAPInterface {
 	 * the message contains 2.05 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="get", signature="rr")
-	public void get(RequestMessage request, ResponseMessage response) throws BusException;
+	@BusMethod
+	public void get(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
 
 	/**
 	 * The POST method. It executes a POST method on the
@@ -57,8 +57,8 @@ public interface CoAPInterface {
 	 * the message contains 2.04 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="rr")
-	public void post(RequestMessage request, ResponseMessage response) throws BusException;
+	@BusMethod
+	public void post(CoAPRequestMessage request, CoAPResponseMessage response) throws BusException;
 
 	/**
 	 * The DELETE method. It executes a DELETE method on the
@@ -69,8 +69,8 @@ public interface CoAPInterface {
 	 * the message contains 2.02 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="r")
-	public void delete(ResponseMessage response) throws BusException;
+	@BusMethod
+	public void delete(CoAPResponseMessage response) throws BusException;
 
 	/**
 	 * The registration method is invoked by an AJ application
@@ -98,7 +98,7 @@ public interface CoAPInterface {
 	 * the resource representation.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusSignal(signature="r")
-	public void notification(ResponseMessage message) throws BusException;
+	@BusSignal
+	public void notification(CoAPResponseMessage message) throws BusException;
 
 }
