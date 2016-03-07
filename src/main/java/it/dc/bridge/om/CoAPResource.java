@@ -62,15 +62,19 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Get(it.dc.bridge.om.CoAPRequestMessage, it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void get(final CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
+	public void get(final RequestMessage request, ResponseMessage response) throws BusException {
 
 		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.GET, request, response);
+		System.out.println("CoAP Resource:");
+		System.out.println(response.getCode());
+		System.out.println(response.getPayloadString()+"\n");
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Post(it.dc.bridge.om.CoAPRequestMessage, it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void post(final CoAPRequestMessage request, CoAPResponseMessage response) throws BusException {
+	public void post(final RequestMessage request, ResponseMessage response) throws BusException {
 
 		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.POST, request, response);
 
@@ -79,7 +83,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Delete(it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void delete(CoAPResponseMessage response) throws BusException {
+	public void delete(ResponseMessage response) throws BusException {
 
 		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null, response);
 
@@ -104,7 +108,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Notification(it.dc.bridge.om.CoAPResponseMessage)
 	 */
-	public void notification(CoAPResponseMessage message) throws BusException {
+	public void notification(ResponseMessage message) throws BusException {
 		// TODO Auto-generated method stub
 
 	}
