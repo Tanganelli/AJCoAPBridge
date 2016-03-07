@@ -59,12 +59,19 @@ public class CoAPProxy implements Runnable {
 		// take the resource path within the CoAP Server from the RD
 		String path = ResourceDirectory.getInstance().getResourcePath(RDPath);
 		
+		LOGGER.info("CoAP Proxy sends a "+request.getCode()+" method call to "+context+" on the resource "+path);
+		
 		CoapClient client = new CoapClient(context+path);
 		
 		CoapResponse response = client.advanced(request);
 		if (response==null) {
 			LOGGER.warning("No response received.");
 		}
+		
+		// FIXME Remove prints
+		System.out.println("Proxy:");
+		System.out.println(response.getCode());
+		System.out.println(response.getResponseText()+"\n");
 		
 		return response;
 		
