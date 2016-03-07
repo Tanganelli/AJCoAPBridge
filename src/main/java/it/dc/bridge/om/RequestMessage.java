@@ -3,9 +3,6 @@ package it.dc.bridge.om;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alljoyn.bus.annotation.Position;
-import org.alljoyn.bus.annotation.Signature;
-
 /**
  * The Class RequestMessage is used in the AllJoyn message exchanges.
  * It represents the CoAP request message and implements the {@link CoAPRequestMessage} interface.
@@ -16,18 +13,12 @@ import org.alljoyn.bus.annotation.Signature;
 public class RequestMessage implements CoAPRequestMessage{
 
 	/** The option fields. */
-	@Position(0)
-	@Signature("r")
 	public Options options;
 
 	/** The query attributes */
-	@Position(1)
-	@Signature("a{ss}")
 	public Map<String,String> attributes;
 
 	/** The message payload. */
-	@Position(2)
-	@Signature("ay")
 	public byte[] payload;
 
 	/**

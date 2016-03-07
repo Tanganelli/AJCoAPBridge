@@ -3,9 +3,6 @@ package it.dc.bridge.om;
 import java.util.Arrays;
 import java.util.List;
 
-import org.alljoyn.bus.annotation.Position;
-import org.alljoyn.bus.annotation.Signature;
-
 /**
  * The Options class is a collection of CoAP option fields.
  * Both requests and responses may include a list of one or more options.
@@ -14,35 +11,23 @@ import org.alljoyn.bus.annotation.Signature;
 public class Options {
 
 	/** Representation format of the message payload. */
-	@Position(0)
-	@Signature("i")
 	public int contentFormat;
 
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
-	@Position(1)
-	@Signature("aay")
 	public byte[][] etag;
 
 	/** Which Content-Format is acceptable to the client. */
-	@Position(2)
-	@Signature("i")
 	public int accept;
 
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
-	@Position(3)
-	@Signature("aay")
 	public byte[][] ifMatch;
 
 	/** To make a request conditional on the nonexistence of the target resource. */
-	@Position(4)
-	@Signature("b")
 	public boolean ifNoneMatch;
 
 	/** Size information about the resource representation. */
-	@Position(5)
-	@Signature("i")
 	public int size1;
 
 	/**

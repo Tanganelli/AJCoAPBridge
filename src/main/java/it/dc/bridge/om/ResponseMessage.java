@@ -1,8 +1,5 @@
 package it.dc.bridge.om;
 
-import org.alljoyn.bus.annotation.Position;
-import org.alljoyn.bus.annotation.Signature;
-
 import it.dc.bridge.om.CoAP.ResponseCode;
 
 /**
@@ -16,18 +13,12 @@ import it.dc.bridge.om.CoAP.ResponseCode;
 public class ResponseMessage implements CoAPResponseMessage{
 
 	/** The code. */
-	@Position(0)
-	@Signature("i")
 	public ResponseCode code;
 
 	/** The opt. */
-	@Position(1)
-	@Signature("r")
 	public Options options;
 
 	/** The payload. */
-	@Position(2)
-	@Signature("ay")
 	public byte[] payload;
 
 	/**
