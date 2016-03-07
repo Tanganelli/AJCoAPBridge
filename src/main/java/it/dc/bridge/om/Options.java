@@ -16,46 +16,46 @@ public class Options {
 	/** Representation format of the message payload. */
 	@Position(0)
 	@Signature("i")
-	private Integer contentFormat;
+	public int contentFormat;
 
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
 	@Position(1)
 	@Signature("aay")
-	private byte[][] etag;
+	public byte[][] etag;
 
 	/** Which Content-Format is acceptable to the client. */
 	@Position(2)
 	@Signature("i")
-	private Integer accept;
+	public int accept;
 
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
 	@Position(3)
 	@Signature("aay")
-	private byte[][] ifMatch;
+	public byte[][] ifMatch;
 
 	/** To make a request conditional on the nonexistence of the target resource. */
 	@Position(4)
 	@Signature("b")
-	private boolean ifNoneMatch;
+	public boolean ifNoneMatch;
 
 	/** Size information about the resource representation. */
 	@Position(5)
 	@Signature("i")
-	private Integer size1;
+	public int size1;
 
 	/**
 	 * Instantiates a new option set.
 	 */
 	public Options() {
 		
-		setContentFormat(null);
+		setContentFormat(-1);
 		setEtag(null);
-		setAccept(null);
+		setAccept(-1);
 		setIfMatch(null);
 		setIfNoneMatch(false);
-		setSize1(null);
+		setSize1(-1);
 		
 	}
 
@@ -93,7 +93,7 @@ public class Options {
 	 */
 	public boolean hasContentFormat() {
 		
-		return contentFormat != null;
+		return contentFormat != -1;
 		
 	}
 
@@ -144,6 +144,7 @@ public class Options {
 	public void setEtag(List<byte[]> etag) {
 		
 		if(etag == null){
+			// AJ does not allow null value (signature is "aay")
 			this.etag = new byte[][]{};
 		}else {
 			this.etag = new byte[etag.size()][];
@@ -170,7 +171,7 @@ public class Options {
 	 */
 	public boolean hasAccept() {
 		
-		return accept != null;
+		return accept != -1;
 		
 	}
 
@@ -221,6 +222,7 @@ public class Options {
 	public void setIfMatch(List<byte[]> ifMatch) {
 
 		if(ifMatch == null){
+			// AJ does not allow null value (signature is "aay")
 			this.ifMatch = new byte[][]{};
 		}else {
 			this.ifMatch = new byte[ifMatch.size()][];

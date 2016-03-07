@@ -18,27 +18,31 @@ public class ResponseMessage implements CoAPResponseMessage{
 	/** The code. */
 	@Position(0)
 	@Signature("i")
-	ResponseCode code;
+	public ResponseCode code;
 
 	/** The opt. */
 	@Position(1)
 	@Signature("r")
-	Options options;
+	public Options options;
 
 	/** The payload. */
 	@Position(2)
 	@Signature("ay")
-	byte[] payload = {};
+	public byte[] payload;
 
 	/**
 	 * Instantiates a new response message.
 	 */
 	public ResponseMessage() {
 
+		// error code if not specified
+		this.code = ResponseCode.INTERNAL_SERVER_ERROR;
 		this.options = new Options();
+		// AJ does not allow null value (signature is "ay")
+		this.payload = new byte[]{};
 
 	}
-	
+
 	/**
 	 * Instantiates a new response with the specified response code.
 	 *
@@ -48,9 +52,11 @@ public class ResponseMessage implements CoAPResponseMessage{
 
 		this.code = code;
 		this.options = new Options();
+		// AJ does not allow null value (signature is "ay")
+		this.payload = new byte[]{};
 
 	}
-	
+
 	public ResponseMessage(ResponseCode code, Options options, byte[] payload) {
 
 		this.code = code;
@@ -109,7 +115,7 @@ public class ResponseMessage implements CoAPResponseMessage{
 	 */
 	public String getPayloadString() {
 
-		if (payload==null)
+		if (payload.length == 0)
 			return "";
 		return new String(payload, CoAP.UTF8_CHARSET);
 
@@ -120,7 +126,12 @@ public class ResponseMessage implements CoAPResponseMessage{
 	 */
 	public void setPayload(byte[] payload) {
 
-		this.payload = payload;
+		if (payload == null) {
+			// AJ does not allow null value (signature is "ay")
+			this.payload = new byte[]{};
+		} else {
+			this.payload = payload;
+		}
 
 	}
 
@@ -130,7 +141,8 @@ public class ResponseMessage implements CoAPResponseMessage{
 	public void setPayload(String payload) {
 
 		if (payload == null) {
-			this.payload = null;
+			// AJ does not allow null value (signature is "ay")
+			this.payload = new byte[]{};
 		} else {
 			setPayload(payload.getBytes(CoAP.UTF8_CHARSET));
 		}

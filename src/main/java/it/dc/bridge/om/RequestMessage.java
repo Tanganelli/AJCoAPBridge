@@ -18,17 +18,17 @@ public class RequestMessage implements CoAPRequestMessage{
 	/** The option fields. */
 	@Position(0)
 	@Signature("r")
-	private Options options;
+	public Options options;
 
 	/** The query attributes */
 	@Position(1)
 	@Signature("a{ss}")
-	private Map<String,String> attributes;
+	public Map<String,String> attributes;
 
 	/** The message payload. */
 	@Position(2)
 	@Signature("ay")
-	private byte[] payload = {};
+	public byte[] payload;
 
 	/**
 	 * Instantiates a new request message.
@@ -37,6 +37,8 @@ public class RequestMessage implements CoAPRequestMessage{
 
 		options = new Options();
 		attributes = new HashMap<String, String>();
+		// AJ does not allow null value (signature is "ay")
+		payload = new byte[]{};
 
 	}
 
@@ -105,7 +107,7 @@ public class RequestMessage implements CoAPRequestMessage{
 	 */
 	public String getPayloadString() {
 
-		if(this.payload == null) {
+		if(this.payload.length == 0) {
 			return "";
 		}
 		return new String(this.payload, CoAP.UTF8_CHARSET);
@@ -116,7 +118,12 @@ public class RequestMessage implements CoAPRequestMessage{
 	 */
 	public void setPayload(byte[] payload) {
 
-		this.payload = payload;
+		if(payload == null) {
+			// AJ does not allow null value (signature is "ay")
+			this.payload = new byte[]{};
+		}else {
+			this.payload = payload;
+		}
 
 	}
 
@@ -126,7 +133,8 @@ public class RequestMessage implements CoAPRequestMessage{
 	public void setPayload(String payload) {
 
 		if(payload == null) {
-			this.payload = null;
+			// AJ does not allow null value (signature is "ay")
+			this.payload = new byte[]{};
 		} else {
 			setPayload(payload.getBytes(CoAP.UTF8_CHARSET));
 		}
