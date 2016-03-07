@@ -1,6 +1,7 @@
 package it.dc.bridge.rd;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -69,7 +70,7 @@ public class RDNodeResource extends CoapResource {
 		LinkAttribute attr;
 
 		int newLifeTime = 86400;
-		String newContext = "";
+		URI newContext = null;
 
 		//get lifetime from option query - only for PUT request.
 		List<String> query = request.getOptions().getUriQuery();
@@ -94,13 +95,11 @@ public class RDNodeResource extends CoapResource {
 		setLifeTime(newLifeTime);
 
 		try {
-			URI check;
-			if (newContext.equals("")) {
-				check = new URI("coap", "", request.getSource().getHostName(), request.getSourcePort(), "", "", ""); // required to set port
-				context = check.toString().replace("@", "").replace("?", "").replace("#", ""); // URI is a silly class
-			} else {
-				check = new URI(context);
+			if (newContext == null) {
+				// default context: source address and port
+				newContext = new URI("coap", "", request.getSource().getHostName(), request.getSourcePort(), "", "", ""); // required to set port
 			}
+			context = newContext.toString().replace("@", "").replace("?", "").replace("#", ""); // URI is a silly class
 		} catch (Exception e) {
 			LOGGER.warning(e.toString());
 			return false;
@@ -116,26 +115,29 @@ public class RDNodeResource extends CoapResource {
 	 * @param query the <attribute=value> pair
 	 * @return the node context, if valid
 	 */
-	private String parseContext(String query) {
+	private URI parseContext(String query) {
 
 		if (query.split("=").length < 2) {
 			LOGGER.warning("Bad context: default context will be use");
-			return "";
+			return null;
 		}
 
 		String context = query.split("=")[1];
-
 
 		// check if the context is a valid url
 		String[] schemes = {"coap", "coaps"};
 		UrlValidator urlValidator = new UrlValidator(schemes);
 		if(urlValidator.isValid(context)) {
-			return context;
+			try {
+				return new URI(context);
+			} catch (URISyntaxException e) {
+				LOGGER.warning(e.toString());
+			}
 		}
 
 		if (context.split(":").length < 2) {
 			LOGGER.warning("Bad context: default context will be use");
-			return "";
+			return null;
 		}
 
 		// check if the context is a valid ip address:port
@@ -143,12 +145,18 @@ public class RDNodeResource extends CoapResource {
 		String port = context.split(":")[1];
 		InetAddressValidator inetValidator = new InetAddressValidator();
 		if(inetValidator.isValid(ip) && StringUtils.isNumeric(port)) {
-			return context;
+			try {
+				return new URI("coap", "", ip, Integer.parseInt(port), "", "", "");
+			} catch (URISyntaxException e) {
+				LOGGER.warning(e.toString());
+			}
 		}
 
 		// TODO validate IPv6 addresses
 		
-		return "";
+		LOGGER.warning("Bad context: default context will be use");
+		
+		return null;
 
 	}
 
