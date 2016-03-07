@@ -28,7 +28,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	private static final ResourceDirectory resourceDirectory = new ResourceDirectory();
 
 	/* CoAP default port */
-	private static final int COAP_PORT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.COAP_PORT);
+	private static final int COAP_PORT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.COAP_PORT) - 1;
 
 	/* Map containing the <identifier, context> pair for each registered node */
 	private Map<String, String> contexts = new ConcurrentHashMap<String, String>();
