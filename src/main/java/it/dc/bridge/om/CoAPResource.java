@@ -60,32 +60,38 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	}
 
 	/* (non-Javadoc)
-	 * @see it.dc.bridge.om.CoAPInterface#Get(it.dc.bridge.om.CoAPRequestMessage, it.dc.bridge.om.CoAPResponseMessage)
+	 * @see it.dc.bridge.om.CoAPInterface#Get(it.dc.bridge.om.RequestMessage)
 	 */
-	public void get(final RequestMessage request, ResponseMessage response) throws BusException {
+	public ResponseMessage get(final RequestMessage request) throws BusException {
 
-		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.GET, request, response);
+		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.GET, request);
 		System.out.println("CoAP Resource:");
 		System.out.println(response.getCode());
 		System.out.println(response.getPayloadString()+"\n");
 		
+		return response;
+		
 	}
 
 	/* (non-Javadoc)
-	 * @see it.dc.bridge.om.CoAPInterface#Post(it.dc.bridge.om.CoAPRequestMessage, it.dc.bridge.om.CoAPResponseMessage)
+	 * @see it.dc.bridge.om.CoAPInterface#Post(it.dc.bridge.om.RequestMessage)
 	 */
-	public void post(final RequestMessage request, ResponseMessage response) throws BusException {
+	public ResponseMessage post(final RequestMessage request) throws BusException {
 
-		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.POST, request, response);
+		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.POST, request);
+		
+		return response;
 
 	}
 
 	/* (non-Javadoc)
-	 * @see it.dc.bridge.om.CoAPInterface#Delete(it.dc.bridge.om.CoAPResponseMessage)
+	 * @see it.dc.bridge.om.CoAPInterface#Delete()
 	 */
-	public void delete(ResponseMessage response) throws BusException {
+	public ResponseMessage delete() throws BusException {
 
-		AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null, response);
+		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null);
+		
+		return response;
 
 	}
 
@@ -106,9 +112,10 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	}
 
 	/* (non-Javadoc)
-	 * @see it.dc.bridge.om.CoAPInterface#Notification(it.dc.bridge.om.CoAPResponseMessage)
+	 * @see it.dc.bridge.om.CoAPInterface#Notification()
 	 */
-	public void notification(ResponseMessage message) throws BusException {
+	public ResponseMessage notification() throws BusException {
+		return null;
 		// TODO Auto-generated method stub
 
 	}

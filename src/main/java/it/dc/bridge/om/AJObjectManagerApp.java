@@ -131,11 +131,9 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param path the URI path
 	 * @param code the request code
 	 * @param request a message implementing the request interface
-	 * @param response an empty message implementing the response interface, it will
-	 * contain the method response
+	 * @return the response message
 	 */
-	public synchronized void callMethod(final String path, final RequestCode code, 
-			final CoAPRequestMessage request, CoAPResponseMessage response) {
+	public synchronized ResponseMessage callMethod(final String path, final RequestCode code, final CoAPRequestMessage request) {
 
 		LOGGER.info("Object Manager received a "+code+" method call on the object "+path);
 		
@@ -146,12 +144,14 @@ public class AJObjectManagerApp implements Runnable {
 		CoapResponse coapResponse = CoAPProxy.callMethod(path, coapRequest);
 
 		// create a CoAPResponseMessage from the Californium Response
-		response = getResponse(coapResponse);
+		ResponseMessage response = getResponse(coapResponse);
 		
 		// FIXME Remove prints
 		System.out.println("Object Manager:");
 		System.out.println(response.getCode());
 		System.out.println(response.getPayloadString()+"\n");
+		
+		return response;
 
 	}
 
@@ -221,12 +221,12 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param coapResponse the Californium CoAP response message
 	 * @return the CoAPResponse message
 	 */
-	private CoAPResponseMessage getResponse(CoapResponse coapResponse) {
+	private ResponseMessage getResponse(CoapResponse coapResponse) {
 
 		org.eclipse.californium.core.coap.CoAP.ResponseCode code = coapResponse.getCode();
 
 		// create the response
-		CoAPResponseMessage response = new ResponseMessage(ResponseCode.valueOf(code.value));
+		ResponseMessage response = new ResponseMessage(ResponseCode.valueOf(code.value));
 
 		// copy the options
 		OptionSet coapOpt = coapResponse.getOptions();

@@ -10,9 +10,9 @@ import org.alljoyn.bus.annotation.BusSignal;
  * the AllJoyn objects representing a CoAP resource.
  * It implements the following RESTful methods:
  * <ul>
- * <li> {@link #get(CoAPRequestMessage,CoAPResponseMessage)} the GET method. </li>
- * <li> {@link #post(CoAPRequestMessage,CoAPResponseMessage)} the POST method. </li>
- * <li> {@link #delete(CoAPResponseMessage)} the DELETE method. </li>
+ * <li> {@link #get(RequestMessage)} the GET method. </li>
+ * <li> {@link #post(RequestMessage)} the POST method. </li>
+ * <li> {@link #delete()} the DELETE method. </li>
  * </ul>
  * <p>
  * In addition to them, the interface implements the methods and the signal
@@ -20,7 +20,7 @@ import org.alljoyn.bus.annotation.BusSignal;
  * <ul>
  * <li> {@link #registration()} registration to the resource observing service. </li>
  * <li> {@link #cancellation()} cancellation from the resource observing service. </li>
- * <li> {@link #notification(CoAPResponseMessage)} signal that represents a resource notification. </li>
+ * <li> {@link #notification()} signal that represents a resource notification. </li>
  * </ul>
  * <p>
  * The signatures of the methods parameters reflect the attributes inside
@@ -40,12 +40,12 @@ public interface CoAPInterface {
 	 * the AJ object that implements this interface.
 	 *
 	 * @param request the request message
-	 * @param response the response message. If the request is fulfilled,
+	 * @return response the response message. If the request is fulfilled,
 	 * the message contains 2.05 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="get", signature="rr")
-	public void get(RequestMessage request, ResponseMessage response) throws BusException;
+	@BusMethod(name="get", signature="r", replySignature="r")
+	public ResponseMessage get(RequestMessage request) throws BusException;
 
 	/**
 	 * The POST method. It executes a POST method on the
@@ -53,24 +53,24 @@ public interface CoAPInterface {
 	 * the AJ object that implements this interface.
 	 *
 	 * @param request the request message
-	 * @param response the response message. If the request is fulfilled,
+	 * @return response the response message. If the request is fulfilled,
 	 * the message contains 2.04 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="rr")
-	public void post(RequestMessage request, ResponseMessage response) throws BusException;
+	@BusMethod(name="post", signature="r", replySignature="r")
+	public ResponseMessage post(RequestMessage request) throws BusException;
 
 	/**
 	 * The DELETE method. It executes a DELETE method on the
 	 * RESTful CoAP interface of the resource represented by
 	 * the AJ object that implements this interface.
 	 *
-	 * @param response the response message. If the request is fulfilled,
+	 * @return response the response message. If the request is fulfilled,
 	 * the message contains 2.02 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(signature="r")
-	public void delete(ResponseMessage response) throws BusException;
+	@BusMethod(name="delete", replySignature="r")
+	public ResponseMessage delete() throws BusException;
 
 	/**
 	 * The registration method is invoked by an AJ application
@@ -94,11 +94,11 @@ public interface CoAPInterface {
 	 * Notification is a signal sent by the AJ object when it
 	 * receive a new notification from a CoAP resource.
 	 *
-	 * @param message the notification message. Its payload contains
+	 * @return message the notification message. Its payload contains
 	 * the resource representation.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusSignal(signature="r")
-	public void notification(ResponseMessage message) throws BusException;
+	@BusSignal(replySignature="r")
+	public ResponseMessage notification() throws BusException;
 
 }
