@@ -21,6 +21,12 @@ import it.dc.bridge.om.AJObjectManagerApp;
  * <p>
  * For the management of the resources, <tt>ResourceDirectory</tt>
  * uses the classes provided by the Californium <i>cf-rd</i> package.
+ * <p>
+ * The <tt>ResourceDirectory</tt> has been re-implemented because of
+ * incompleteness and the interaction with the other <tt>Bridge</tt>
+ * components: when a resource registration or a resource removal
+ * occur, the <tt>ResourceDirectory</tt> has to notify the <tt>AJObjectManagerApp</tt>
+ * and the <tt>CoAPProxy</tt>.
  */ 
 public class ResourceDirectory extends CoapServer implements Runnable {
 
