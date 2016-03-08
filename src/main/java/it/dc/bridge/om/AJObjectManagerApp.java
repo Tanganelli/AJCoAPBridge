@@ -12,10 +12,10 @@ import org.alljoyn.bus.Mutable;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.SessionPortListener;
 import org.alljoyn.bus.Status;
-import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
+import org.eclipse.californium.core.coap.Response;
 
 import it.dc.bridge.om.CoAP.RequestCode;
 import it.dc.bridge.om.CoAP.ResponseCode;
@@ -141,7 +141,7 @@ public class AJObjectManagerApp implements Runnable {
 		Request coapRequest = getRequest(code, request);
 
 		// send the method call to the Proxy
-		CoapResponse coapResponse = CoAPProxy.callMethod(path, coapRequest);
+		Response coapResponse = CoAPProxy.getInstance().callMethod(path, coapRequest);
 
 		// create a CoAPResponseMessage from the Californium Response
 		ResponseMessage response = getResponse(coapResponse);
@@ -221,7 +221,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param coapResponse the Californium CoAP response message
 	 * @return the CoAPResponse message
 	 */
-	private ResponseMessage getResponse(CoapResponse coapResponse) {
+	private ResponseMessage getResponse(Response coapResponse) {
 
 		org.eclipse.californium.core.coap.CoAP.ResponseCode code = coapResponse.getCode();
 
