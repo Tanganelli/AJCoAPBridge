@@ -125,7 +125,6 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			} else if (code == ResponseCode.VALID) {
 				// increase the max-age value according to the new response
 				Long maxAgeOption = response.getOptions().getMaxAge();
-				System.out.println("max age="+maxAgeOption);
 				if (maxAgeOption != null) {
 					// get the cached response
 					Response cachedResponse = responseCache.getUnchecked(cacheKey);
@@ -178,9 +177,9 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	}
 
 	public CacheStats getCacheStats() {
-		
+
 		return responseCache.stats();
-		
+
 	}
 
 	/**
@@ -191,6 +190,8 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	 * the cache (according to the freshness model) and returns it. On the
 	 * contrary, if the response has passed its expiration time, it is
 	 * invalidated and the method returns null.
+	 * 
+	 * @param request the request message
 	 */
 	public Response getResponse(Request request) {
 		if (!enabled) {
@@ -240,8 +241,10 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	}
 
 	public void invalidateRequest(Request request) {
+		
 		invalidateRequest(CacheKey.fromAcceptOptions(request));
 		LOGGER.finer("Invalidated request");
+		
 	}
 
 	@Override
@@ -275,9 +278,9 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	}
 
 	private long getRemainingLifetime(Response response) {
-		
+
 		return getRemainingLifetime(response, System.nanoTime());
-		
+
 	}
 
 	/**
@@ -287,20 +290,16 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	 * timestamp. If the max-age option is not specified, it will be assumed the
 	 * default (60 seconds).
 	 * 
-	 * @param response
-	 *            the response
-	 * @param currentTime
+	 * @param response the response
+	 * @param currentTime the current time
 	 * @return true, if is expired
 	 */
 	private long getRemainingLifetime(Response response, long currentTime) {
-		
-		System.out.println("current time: "+currentTime);
+
 		// get the timestamp
 		long arriveTime = response.getTimestamp();
-		System.out.println("timestamp: "+arriveTime);
 
 		Long maxAgeOption = response.getOptions().getMaxAge();
-		System.out.println("max age: "+maxAgeOption);
 		long oldMaxAge = OptionNumberRegistry.Defaults.MAX_AGE;
 		if (maxAgeOption != null) {
 			oldMaxAge = maxAgeOption.longValue();
@@ -309,17 +308,21 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		// calculate the time that the response has spent in the cache
 		double secondsInCache = TimeUnit.NANOSECONDS.toSeconds(currentTime - arriveTime);
 		int cacheTime = Ints.checkedCast(Math.round(secondsInCache));
-		
+
 		return oldMaxAge - cacheTime;
-		
+
 	}
 
 	private void invalidateRequest(CacheKey cacheKey) {
+		
 		responseCache.invalidate(cacheKey);
+		
 	}
 
 	private void invalidateRequest(List<CacheKey> cacheKeys) {
+		
 		responseCache.invalidateAll(cacheKeys);
+		
 	}
 
 	private Response validate(CacheKey cachedRequest) {
@@ -334,7 +337,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	 * that with or without the accept options produce the same response).
 	 */
 	private static final class CacheKey {
-		
+
 		private final String uriHost;
 		private final int mediaType;
 		private Response response;
@@ -351,7 +354,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		 * @return the list of cache keys
 		 */
 		private static List<CacheKey> fromAcceptOptions(Request request) {
-			
+
 			if (request == null) {
 				throw new IllegalArgumentException("request == null");
 			}
@@ -414,7 +417,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			cacheKey.setResponse(response);
 
 			return cacheKey;
-			
+
 		}
 
 		public CacheKey(String uriHost, int mediaType, byte[] payload) {
