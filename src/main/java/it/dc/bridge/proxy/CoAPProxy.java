@@ -67,7 +67,6 @@ public class CoAPProxy implements Runnable {
 	 * @param RDPath the resource path inside the RD
 	 * @param request the request message
 	 * @return the response message
-	 * @throws InterruptedException 
 	 */
 	public Response callMethod(final String RDPath, final Request request) {
 
@@ -106,13 +105,17 @@ public class CoAPProxy implements Runnable {
 			// timeout
 			if (response == null) {
 				LOGGER.warning("No response received.");
-				response = new Response(ResponseCode.GATEWAY_TIMEOUT);
+				return new Response(ResponseCode.GATEWAY_TIMEOUT);
 			}
 		} catch (InterruptedException e) {
 			LOGGER.warning("Receiving of response interrupted: " + e.getMessage());
-			response = new Response(ResponseCode.INTERNAL_SERVER_ERROR);
+			return new Response(ResponseCode.INTERNAL_SERVER_ERROR);
 		}
 
+		// set the response timestamp
+		long timestamp = System.nanoTime();
+		response.setTimestamp(timestamp);
+		
 		request.setResponse(response);
 
 		// cache response
