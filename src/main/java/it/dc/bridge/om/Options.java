@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.alljoyn.bus.annotation.Position;
 import org.alljoyn.bus.annotation.Signature;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 /**
  * The Options class is a collection of CoAP option fields.
@@ -50,9 +51,9 @@ public class Options {
 	 */
 	public Options() {
 		
-		setContentFormat(-1);
+		setContentFormat(null);
 		setEtag(null);
-		setAccept(-1);
+		setAccept(null);
 		setIfMatch(null);
 		setIfNoneMatch(false);
 		setSize1(-1);
@@ -82,7 +83,7 @@ public class Options {
 	 */
 	public int getContentFormat() {
 		
-		return hasContentFormat() ? contentFormat : -1;
+		return contentFormat;
 		
 	}
 
@@ -93,7 +94,7 @@ public class Options {
 	 */
 	public boolean hasContentFormat() {
 		
-		return contentFormat != -1;
+		return contentFormat != MediaTypeRegistry.UNDEFINED;
 		
 	}
 
@@ -104,7 +105,7 @@ public class Options {
 	 */
 	public void setContentFormat(Integer contentFormat) {
 		
-		this.contentFormat = contentFormat;
+		this.contentFormat = (contentFormat != null) ? contentFormat : MediaTypeRegistry.UNDEFINED;
 		
 	}
 
@@ -160,7 +161,7 @@ public class Options {
 	 */
 	public int getAccept() {
 		
-		return hasAccept() ? accept : -1;
+		return accept;
 		
 	}
 
@@ -171,7 +172,7 @@ public class Options {
 	 */
 	public boolean hasAccept() {
 		
-		return accept != -1;
+		return accept != MediaTypeRegistry.UNDEFINED;
 		
 	}
 
@@ -182,7 +183,7 @@ public class Options {
 	 */
 	public void setAccept(Integer accept) {
 		
-		this.accept = (accept != null) ? accept : -1;
+		this.accept = (accept != null) ? accept : MediaTypeRegistry.UNDEFINED;
 		
 	}
 
