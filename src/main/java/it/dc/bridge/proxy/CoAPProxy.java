@@ -76,18 +76,17 @@ public class CoAPProxy implements Runnable {
 		// take the resource path within the CoAP Server from the RD
 		String path = ResourceDirectory.getInstance().getResourcePath(RDPath);
 
-		request.setURI(context);
-		System.out.println("Uri:"+request.getURI()+" context:"+context);
+		request.setURI(context+path);
 
 		Response response = null;
-/*
+		/*
 		// check the cache for a valid response
 		response = cache.getResponse(request);
 		if (response != null) {
 			LOGGER.info("Cache returned "+response);
 			return response;
 		}
-*/
+		 */
 		LOGGER.info("CoAP Proxy sends a "+request.getCode()+" method call to "+context+" on the resource "+path);
 
 		// send request
@@ -96,7 +95,7 @@ public class CoAPProxy implements Runnable {
 		// wait for response
 		try {
 			response = request.waitForResponse(TIMEOUT);
-			
+
 			// timeout
 			if (response == null) {
 				LOGGER.warning("No response received.");
