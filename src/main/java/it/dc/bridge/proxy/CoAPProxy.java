@@ -3,6 +3,7 @@ package it.dc.bridge.proxy;
 import java.util.logging.Logger;
 
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
+import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.network.config.NetworkConfig;
@@ -78,15 +79,21 @@ public class CoAPProxy implements Runnable {
 
 		request.setURI(context+path);
 
+		// set uri-host and uri-port options
+		OptionSet options = new OptionSet(request.getOptions());
+		options.setUriHost(request.getDestination().getHostAddress());
+		options.setUriPort(request.getDestinationPort());
+		request.setOptions(options);
+
 		Response response = null;
-		/*
+
 		// check the cache for a valid response
 		response = cache.getResponse(request);
 		if (response != null) {
 			LOGGER.info("Cache returned "+response);
 			return response;
 		}
-		 */
+
 		LOGGER.info("CoAP Proxy sends a "+request.getCode()+" method call to "+context+" on the resource "+path);
 
 		// send request
@@ -105,6 +112,11 @@ public class CoAPProxy implements Runnable {
 			LOGGER.warning("Receiving of response interrupted: " + e.getMessage());
 			response = new Response(ResponseCode.INTERNAL_SERVER_ERROR);
 		}
+
+		request.setResponse(response);
+
+		// cache response
+		cache.cacheResponse(request, response);
 
 		// FIXME Remove prints
 		System.out.println("Proxy:");
