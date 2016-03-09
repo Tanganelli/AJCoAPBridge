@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
@@ -29,6 +30,9 @@ import it.dc.bridge.om.AJObjectManagerApp;
  * and the <tt>CoAPProxy</tt>.
  */ 
 public class ResourceDirectory extends CoapServer implements Runnable {
+	
+	/* the logger */
+	private static final Logger LOGGER = Logger.getGlobal();
 
 	/* the class instance */
 	private static final ResourceDirectory resourceDirectory = new ResourceDirectory();
@@ -226,7 +230,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 
 		resourceDirectory.start(); 
 
-		System.out.printf(ResourceDirectory.class.getSimpleName() + " listening on port %d.\n", resourceDirectory.getEndpoints().get(0).getAddress().getPort());
+		LOGGER.info(ResourceDirectory.class.getSimpleName() + " listening on port "+resourceDirectory.getEndpoints().get(0).getAddress().getPort());
 
 	}
 
