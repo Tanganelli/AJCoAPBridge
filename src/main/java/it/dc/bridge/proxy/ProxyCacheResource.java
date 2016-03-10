@@ -99,7 +99,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	 * the key and caches the response if the max-age option is higher than
 	 * zero.
 	 */
-	public void cacheResponse(Request request, Response response) {
+	public synchronized void cacheResponse(Request request, Response response) {
 		// enable or disable the caching (debug purposes)
 		if (!enabled) {
 			return;
@@ -175,7 +175,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		}
 	}
 
-	public CacheStats getCacheStats() {
+	public synchronized CacheStats getCacheStats() {
 
 		return responseCache.stats();
 
@@ -192,7 +192,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	 * 
 	 * @param request the request message
 	 */
-	public Response getResponse(Request request) {
+	public synchronized Response getResponse(Request request) {
 		if (!enabled) {
 			return null;
 		}
@@ -232,7 +232,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		return response;
 	}
 
-	public void invalidateRequest(Request request) {
+	public synchronized void invalidateRequest(Request request) {
 
 		invalidateRequest(CacheKey.fromAcceptOptions(request));
 		LOGGER.fine("Invalidated request");
