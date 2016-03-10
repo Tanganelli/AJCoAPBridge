@@ -362,8 +362,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			List<CacheKey> cacheKeys = new LinkedList<ProxyCacheResource.CacheKey>();
 			String uriHost = request.getOptions().getUriHost();
 			try {
-				// TODO why not UTF-8?
-				uriHost = URLEncoder.encode(uriHost, "ISO-8859-1");
+				uriHost = URLEncoder.encode(uriHost, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				LOGGER.severe("ISO-8859-1 encoding not supported: " + e.getMessage());
 			}
