@@ -114,8 +114,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Notification()
 	 */
-	public ResponseMessage notification() throws BusException {
-		return null;
+	public void notification(ResponseMessage message) throws BusException {
 		// TODO Auto-generated method stub
 
 	}
