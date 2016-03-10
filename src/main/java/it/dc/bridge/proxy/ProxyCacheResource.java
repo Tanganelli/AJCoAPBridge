@@ -226,14 +226,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 				response.setTimestamp(currentTime);
 			} else {
 				LOGGER.info("Expired response");
-
-				// try to validate the response
-				response = validate(cacheKey);
-				if (response != null) {
-					LOGGER.info("Validation successful");
-				} else {
-					invalidateRequest(cacheKey);
-				}
+				invalidateRequest(cacheKey);
 			}
 		}
 
@@ -241,10 +234,10 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	}
 
 	public void invalidateRequest(Request request) {
-		
+
 		invalidateRequest(CacheKey.fromAcceptOptions(request));
 		LOGGER.finer("Invalidated request");
-		
+
 	}
 
 	@Override
@@ -314,20 +307,15 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	}
 
 	private void invalidateRequest(CacheKey cacheKey) {
-		
+
 		responseCache.invalidate(cacheKey);
-		
+
 	}
 
 	private void invalidateRequest(List<CacheKey> cacheKeys) {
-		
-		responseCache.invalidateAll(cacheKeys);
-		
-	}
 
-	private Response validate(CacheKey cachedRequest) {
-		// TODO
-		return null;
+		responseCache.invalidateAll(cacheKeys);
+
 	}
 
 	/**
@@ -376,7 +364,6 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 				cacheKeys.add(cacheKey);
 			} else {
 				// if the accept options are not set, simply set all media types
-				// FIXME not efficient
 				for (Integer acceptType : MediaTypeRegistry.getAllMediaTypes()) {
 					CacheKey cacheKey = new CacheKey(uriHost, acceptType, payload);
 					cacheKeys.add(cacheKey);
