@@ -78,7 +78,7 @@ public interface CoAPInterface {
 	 *
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod
+	@BusMethod(name="registration")
 	public void registration() throws BusException;
 
 	/**
@@ -87,18 +87,18 @@ public interface CoAPInterface {
 	 *
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod
+	@BusMethod(name="cancellation")
 	public void cancellation() throws BusException;
 
 	/**
 	 * Notification is a signal sent by the AJ object when it
 	 * receive a new notification from a CoAP resource.
 	 *
-	 * @return message the notification message. Its payload contains
+	 * @param message the notification message. Its payload contains
 	 * the resource representation.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusSignal(replySignature="r")
-	public ResponseMessage notification() throws BusException;
+	@BusSignal(name="notification", signature="r")
+	public void notification(ResponseMessage message) throws BusException;
 
 }
