@@ -65,12 +65,9 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public ResponseMessage get(final RequestMessage request) throws BusException {
 
 		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.GET, request);
-		System.out.println("CoAP Resource:");
-		System.out.println(response.getCode());
-		System.out.println(response.getPayloadString()+"\n");
-		
+
 		return response;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -79,7 +76,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public ResponseMessage post(final RequestMessage request) throws BusException {
 
 		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.POST, request);
-		
+
 		return response;
 
 	}
@@ -90,7 +87,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public ResponseMessage delete() throws BusException {
 
 		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null);
-		
+
 		return response;
 
 	}

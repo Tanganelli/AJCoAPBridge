@@ -116,16 +116,11 @@ public class CoAPProxy implements Runnable {
 		// set the response timestamp
 		long timestamp = System.nanoTime();
 		response.setTimestamp(timestamp);
-		
+
 		request.setResponse(response);
 
 		// cache response
 		cache.cacheResponse(request, response);
-
-		// FIXME Remove prints
-		System.out.println("Proxy:");
-		System.out.println(response.getCode());
-		System.out.println(response.getPayloadString()+"\n");
 
 		return response;
 

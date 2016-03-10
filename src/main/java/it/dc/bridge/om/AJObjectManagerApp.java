@@ -87,7 +87,7 @@ public class AJObjectManagerApp implements Runnable {
 
 			return;
 		}
-		
+
 		LOGGER.info("Registered bus object: "+objectPath);
 
 		resources.put(objectPath, resource);
@@ -136,7 +136,7 @@ public class AJObjectManagerApp implements Runnable {
 	public synchronized ResponseMessage callMethod(final String path, final RequestCode code, final CoAPRequestMessage request) {
 
 		LOGGER.info("Object Manager received a "+code+" method call on the object "+path);
-		
+
 		// create a Californium request from the CoAPRequestMessage request
 		Request coapRequest = getRequest(code, request);
 
@@ -145,12 +145,7 @@ public class AJObjectManagerApp implements Runnable {
 
 		// create a CoAPResponseMessage from the Californium Response
 		ResponseMessage response = getResponse(coapResponse);
-		
-		// FIXME Remove prints
-		System.out.println("Object Manager:");
-		System.out.println(response.getCode());
-		System.out.println(response.getPayloadString()+"\n");
-		
+
 		return response;
 
 	}
