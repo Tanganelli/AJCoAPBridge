@@ -44,7 +44,7 @@ public interface CoAPInterface {
 	 * the message contains 2.05 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="get", signature="r", replySignature="r")
+	@BusMethod (name="get", signature="r", replySignature="r")
 	public ResponseMessage get(RequestMessage request) throws BusException;
 
 	/**
@@ -57,7 +57,7 @@ public interface CoAPInterface {
 	 * the message contains 2.04 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="post", signature="r", replySignature="r")
+	@BusMethod (name="post", signature="r", replySignature="r")
 	public ResponseMessage post(RequestMessage request) throws BusException;
 
 	/**
@@ -69,7 +69,7 @@ public interface CoAPInterface {
 	 * the message contains 2.02 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="delete", replySignature="r")
+	@BusMethod (name="delete", replySignature="r")
 	public ResponseMessage delete() throws BusException;
 
 	/**
@@ -78,16 +78,16 @@ public interface CoAPInterface {
 	 *
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="registration")
+	@BusMethod (name="registration")
 	public void registration() throws BusException;
 
 	/**
 	 * The cancellation method is invoked by an AJ application
-	 * that wants to deregister from a resource notification.
+	 * that wants to unregister from a resource notification.
 	 *
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod(name="cancellation")
+	@BusMethod (name="cancellation")
 	public void cancellation() throws BusException;
 
 	/**
@@ -98,7 +98,7 @@ public interface CoAPInterface {
 	 * the resource representation.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusSignal(name="notification", signature="r")
+	@BusSignal (name="notification", signature="r")
 	public void notification(ResponseMessage message) throws BusException;
 
 }
