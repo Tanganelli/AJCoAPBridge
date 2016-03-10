@@ -7,10 +7,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.alljoyn.bus.BusAttachment;
+import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.BusListener;
 import org.alljoyn.bus.Mutable;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.SessionPortListener;
+import org.alljoyn.bus.SignalEmitter;
 import org.alljoyn.bus.Status;
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.OptionSet;
@@ -47,13 +49,19 @@ public class AJObjectManagerApp implements Runnable {
 	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
 
 	/* map containing the <object path, AJ object> pair for each registered object */
-	private static Map<String, CoAPResource> resources = new ConcurrentHashMap<String,CoAPResource>();
+	private static Map<String, CoAPResource> resources = new ConcurrentHashMap<String, CoAPResource>();
 
-	/* map containing the number of current observer for each resource */
+	/* map containing the <object path, signal emitter> pair for each object */
+	private static Map<String, SignalEmitter> emitters = new ConcurrentHashMap<String, SignalEmitter>();
+
+	/* map containing the number of current observers for each resource */
 	private static Map<String, Integer> observerCount = new ConcurrentHashMap<String, Integer>();
 
 	/* a connection to the message bus */
 	private static BusAttachment mBus;
+	
+	/* the CoAP interface for signal emitting */
+	private static CoAPInterface objectInterface;
 
 	/*
 	 * Since the class is a singleton, the constructor must be private
@@ -97,6 +105,10 @@ public class AJObjectManagerApp implements Runnable {
 		// put the new object in the resources map
 		resources.put(objectPath, resource);
 
+		// create a signal emitter and associate it to the object
+		SignalEmitter emitter = new SignalEmitter(resource, SignalEmitter.GlobalBroadcast.On);
+		emitters.put(objectPath, emitter);
+
 		// initialize to zero the number of observers for the resource
 		observerCount.put(objectPath, 0);
 
@@ -115,9 +127,11 @@ public class AJObjectManagerApp implements Runnable {
 		// remove the object from the resource map
 		resources.remove(objectPath);
 
+		// remove the signal emitter
+		emitters.remove(objectPath);
+
 		// remove the object from the observable resources
 		observerCount.remove(objectPath);
-		// TODO if the observers was more than zero, informs the Proxy
 
 	}
 
@@ -144,11 +158,96 @@ public class AJObjectManagerApp implements Runnable {
 		// send the method call to the Proxy
 		Response coapResponse = CoAPProxy.getInstance().callMethod(path, coapRequest);
 
-		// create a CoAPResponseMessage from the Californium Response
+		// create a ResponseMessage from the Californium Response
 		ResponseMessage response = getResponse(coapResponse);
 
 		return response;
 
+	}
+
+	/**
+	 * Increments the number of observers for the specific object.
+	 * If the caller is the first observer, the method sends to the
+	 * <tt>CoAPProxy</tt> a request in order to receive future notifications
+	 * from that resource.
+	 * 
+	 * @param objectPath the object path of the observable resource
+	 */
+	public synchronized void addObserver(String objectPath) {
+
+		// check if the entry exists
+		if (!observerCount.containsKey(objectPath)) {
+			LOGGER.warning("The object "+objectPath+" does not exist.");
+			return;
+		}
+
+		int observers = observerCount.get(objectPath);
+
+		if (observers == 0) {
+			// TODO send to the Proxy a request with the observe field
+		}
+
+		// increment the number of observers
+		observerCount.put(objectPath, observers+1);
+
+	}
+
+	/**
+	 * Decrement the number of observer for the specific object.
+	 * If the resource remains without observers, the method informs
+	 * the <tt>CoAPProxy</tt> in order to stop receiving notifications.
+	 * 
+	 * @param objectPath the object path
+	 */
+	public synchronized void removeObserver(String objectPath) {
+
+		// check if the entry exists
+		if (!observerCount.containsKey(objectPath)) {
+			LOGGER.warning("The object "+objectPath+" does not exist.");
+			return;
+		}
+
+		int observers = observerCount.get(objectPath);
+
+		// check if the object has not observers to be removed
+		if (observers == 0) {
+			LOGGER.warning("The object "+objectPath+" has not observers.");
+			return;
+		}
+
+		observerCount.put(objectPath, observers-1);
+
+		// if there are not observers, inform the proxy
+		if (observerCount.get(objectPath) == 0) {
+			// TODO inform the Proxy
+		}
+
+	}
+	
+	/**
+	 * Sends a notification for the specific object to the AllJoyn network.
+	 * The method receives a CoAP message, translates it into a
+	 * {@link ResponseMessage} and sends this one as an AllJoyn signal.
+	 * 
+	 * @param objectPath the object path
+	 * @param coapMessage the CoAP message to notify
+	 */
+	public void notify(String objectPath, Response coapMessage) {
+		
+		// create a ResponseMessage from a Californium Response
+		ResponseMessage message = getResponse(coapMessage);
+		
+		// get the object signal emitter
+		SignalEmitter emitter = emitters.get(objectPath);
+		objectInterface = emitter.getInterface(CoAPInterface.class);
+		
+		try {
+			// send the notification
+			objectInterface.notification(message);
+		} catch (BusException e) {
+			LOGGER.severe("AllJoyn BusException during notification.");
+		}
+		
 	}
 
 	/**
@@ -242,65 +341,6 @@ public class AJObjectManagerApp implements Runnable {
 		response.setPayload(coapResponse.getPayload());
 
 		return response;
-	}
-
-	/**
-	 * Increments the number of observers for the specific object.
-	 * If the caller is the first observer, the method sends to the
-	 * <tt>CoAPProxy</tt> a request in order to receive future notifications
-	 * from that resource.
-	 * 
-	 * @param objectPath the object path of the observable resource
-	 */
-	public synchronized void addObserver(String objectPath) {
-
-		// check if the entry exists
-		if (!observerCount.containsKey(objectPath)) {
-			LOGGER.warning("The object "+objectPath+" does not exist.");
-			return;
-		}
-		
-		int observers = observerCount.get(objectPath);
-
-		if (observers == 0) {
-			// TODO send to the Proxy a request with the observe field
-		}
-
-		// increment the number of observers
-		observerCount.put(objectPath, observers+1);
-
-	}
-	
-	/**
-	 * Decrement the number of observer for the specific object.
-	 * If the resource remains without observers, the method informs
-	 * the <tt>CoAPProxy</tt> in order to stop receiving notifications.
-	 * 
-	 * @param objectPath the object path
-	 */
-	public synchronized void removeObserver(String objectPath) {
-		
-		// check if the entry exists
-		if (!observerCount.containsKey(objectPath)) {
-			LOGGER.warning("The object "+objectPath+" does not exist.");
-			return;
-		}
-		
-		int observers = observerCount.get(objectPath);
-		
-		// check if the object has not observers to be removed
-		if (observers == 0) {
-			LOGGER.warning("The object "+objectPath+" has not observers.");
-			return;
-		}
-		
-		observerCount.put(objectPath, observers-1);
-		
-		// if there are not observers, inform the proxy
-		if (observerCount.get(objectPath) == 0) {
-			// TODO inform the Proxy
-		}
-		
 	}
 
 	/**
