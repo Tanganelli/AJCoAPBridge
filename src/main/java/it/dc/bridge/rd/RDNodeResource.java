@@ -101,7 +101,7 @@ public class RDNodeResource extends CoapResource {
 			}
 			context = newContext.toString().replace("@", "").replace("?", "").replace("#", ""); // URI is a silly class
 		} catch (Exception e) {
-			LOGGER.warning(e.toString());
+			LOGGER.severe(e.toString());
 			return false;
 		}
 
@@ -131,7 +131,7 @@ public class RDNodeResource extends CoapResource {
 			try {
 				return new URI(context);
 			} catch (URISyntaxException e) {
-				LOGGER.warning(e.toString());
+				LOGGER.severe(e.toString());
 			}
 		}
 
@@ -148,7 +148,7 @@ public class RDNodeResource extends CoapResource {
 			try {
 				return new URI("coap", "", ip, Integer.parseInt(port), "", "", "");
 			} catch (URISyntaxException e) {
-				LOGGER.warning(e.toString());
+				LOGGER.severe(e.toString());
 			}
 		}
 

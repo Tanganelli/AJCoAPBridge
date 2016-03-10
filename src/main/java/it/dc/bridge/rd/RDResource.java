@@ -80,7 +80,7 @@ public class RDResource extends CoapResource {
 		// the endpoint name is mandatory during registration
 		if (endpointName.equals("")) { 
 			exchange.respond(ResponseCode.BAD_REQUEST, "Missing endpoint (?ep)"); 
-			LOGGER.info("Missing endpoint: "+exchange.getSourceAddress()); 
+			LOGGER.warning("Missing endpoint: "+exchange.getSourceAddress()); 
 			return; 
 		} 
 
@@ -116,7 +116,7 @@ public class RDResource extends CoapResource {
 			return; 
 		} 
 
-		LOGGER.info("Adding new endpoint: "+resource.getContext());
+		LOGGER.fine("Adding new endpoint: "+resource.getContext());
 
 		String location = resource.getURI();
 

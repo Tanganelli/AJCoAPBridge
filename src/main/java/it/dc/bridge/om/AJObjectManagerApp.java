@@ -274,7 +274,7 @@ public class AJObjectManagerApp implements Runnable {
 			System.exit(0);
 			return;
 		}
-		LOGGER.info("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address")); 
+		LOGGER.fine("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address")); 
 
 		// request a well known name
 		int flags = 0; //no request name flags
@@ -284,7 +284,7 @@ public class AJObjectManagerApp implements Runnable {
 			System.exit(0);
 			return;
 		}
-		LOGGER.info("BusAttachment.request 'com.bridge.coap' successful");
+		LOGGER.fine("BusAttachment.request 'com.bridge.coap' successful");
 
 		// advertise the well known name
 		status = mBus.advertiseName("com.bridge.coap", SessionOpts.TRANSPORT_ANY);
@@ -293,7 +293,7 @@ public class AJObjectManagerApp implements Runnable {
 			mBus.releaseName("com.bridge.coap");
 			return;
 		}
-		LOGGER.info("BusAttachment.advertiseName 'com.bridge.coap' successful");
+		LOGGER.fine("BusAttachment.advertiseName 'com.bridge.coap' successful");
 
 		Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
 
@@ -316,7 +316,7 @@ public class AJObjectManagerApp implements Runnable {
 		Status status = mBus.bindSessionPort(contactPort, sessionOpts, 
 				new SessionPortListener() {
 			public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
-				LOGGER.info("SessionPortListener.acceptSessionJoiner called");
+				LOGGER.fine("SessionPortListener.acceptSessionJoiner called");
 				if (sessionPort == CONTACT_PORT) {
 					return true;
 				} else {
@@ -324,13 +324,13 @@ public class AJObjectManagerApp implements Runnable {
 				}
 			}
 			public void sessionJoined(short sessionPort, int id, String joiner) {
-				LOGGER.info(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
+				LOGGER.fine(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
 			}
 		});
 		if (status != Status.OK) {
 			return;
 		}
-		LOGGER.info("BusAttachment.bindSessionPort successful");
+		LOGGER.fine("BusAttachment.bindSessionPort successful");
 
 	}
 

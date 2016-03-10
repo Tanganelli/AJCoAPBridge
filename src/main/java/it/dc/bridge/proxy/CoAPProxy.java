@@ -30,6 +30,7 @@ public class CoAPProxy implements Runnable {
 	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
 
+	/* the timeout value */
 	private static final int TIMEOUT = NetworkConfig.getStandard().getInt(NetworkConfig.Keys.ACK_TIMEOUT);
 
 	/* the class instance */
@@ -89,7 +90,7 @@ public class CoAPProxy implements Runnable {
 		// check the cache for a valid response
 		response = cache.getResponse(request);
 		if (response != null) {
-			LOGGER.info("Cache returned "+response);
+			LOGGER.fine("Cache returned "+response);
 			return response;
 		}
 
@@ -108,7 +109,7 @@ public class CoAPProxy implements Runnable {
 				return new Response(ResponseCode.GATEWAY_TIMEOUT);
 			}
 		} catch (InterruptedException e) {
-			LOGGER.warning("Receiving of response interrupted: " + e.getMessage());
+			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
 			return new Response(ResponseCode.INTERNAL_SERVER_ERROR);
 		}
 

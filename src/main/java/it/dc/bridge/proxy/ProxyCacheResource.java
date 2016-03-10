@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
@@ -115,7 +114,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			try {
 				cacheKey = CacheKey.fromContentTypeOption(request);
 			} catch (URISyntaxException e) {
-				LOGGER.warning("Cannot create the cache key: " + e.getMessage());
+				LOGGER.severe("Cannot create the cache key: " + e.getMessage());
 			}
 
 			if (code == ResponseCode.CREATED || code == ResponseCode.DELETED || code == ResponseCode.CHANGED) {
@@ -137,7 +136,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 					cachedResponse.getOptions().setMaxAge(newMaxAge);
 					cachedResponse.setTimestamp(newCurrentTime);
 
-					LOGGER.finer("Updated cached response");
+					LOGGER.fine("Updated cached response");
 				} else {
 					LOGGER.warning("No max-age option set in response: " + response);
 				}
@@ -156,13 +155,13 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 						// when used the get method.
 						Response responseInserted = responseCache.get(cacheKey);
 						if (responseInserted != null) {
-							LOGGER.info("Cached response");
+							LOGGER.fine("Cached response");
 						} else {
 							LOGGER.warning("Failed to insert the response in the cache");
 						}
 					} catch (Exception e) {
 						// swallow
-						LOGGER.log(Level.WARNING, "Exception while inserting the response in the cache", e);
+						LOGGER.severe("Exception while inserting the response in the cache");
 					}
 				} else {
 					// if the max-age option is set to 0, then the response
@@ -236,7 +235,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	public void invalidateRequest(Request request) {
 
 		invalidateRequest(CacheKey.fromAcceptOptions(request));
-		LOGGER.finer("Invalidated request");
+		LOGGER.fine("Invalidated request");
 
 	}
 
@@ -352,7 +351,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			try {
 				uriHost = URLEncoder.encode(uriHost, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				LOGGER.severe("ISO-8859-1 encoding not supported: " + e.getMessage());
+				LOGGER.severe("UTF-8 encoding not supported: " + e.getMessage());
 			}
 			byte[] payload = request.getPayload();
 
