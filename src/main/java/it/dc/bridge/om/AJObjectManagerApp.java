@@ -47,7 +47,10 @@ public class AJObjectManagerApp implements Runnable {
 	private static final AJObjectManagerApp objectManager = new AJObjectManagerApp();
 
 	/* map containing the <object path, AJ object> pair for each registered object */
-	private static Map<String,CoAPResource> resources = new ConcurrentHashMap<String,CoAPResource>();
+	private static Map<String, CoAPResource> resources = new ConcurrentHashMap<String,CoAPResource>();
+
+	/* map containing the number of current observer for each resource */
+	private static Map<String, Integer> observerCount = new ConcurrentHashMap<String, Integer>();
 
 	/* a connection to the message bus */
 	private static BusAttachment mBus;
@@ -81,6 +84,7 @@ public class AJObjectManagerApp implements Runnable {
 
 		CoAPResource resource = new CoAPResource(objectPath);
 
+		// register the new object to the bus
 		Status status = mBus.registerBusObject(resource, objectPath);
 		if (Status.OK != status) {
 			LOGGER.warning("BusAttachment.registerBusObject() failed: " + status);
@@ -90,7 +94,11 @@ public class AJObjectManagerApp implements Runnable {
 
 		LOGGER.info("Registered bus object: "+objectPath);
 
+		// put the new object in the resources map
 		resources.put(objectPath, resource);
+
+		// initialize to zero the number of observers for the resource
+		observerCount.put(objectPath, 0);
 
 	}
 
@@ -101,23 +109,16 @@ public class AJObjectManagerApp implements Runnable {
 	 */
 	public synchronized void removeResource(String objectPath) {
 
+		// unregister the object from the bus
 		mBus.unregisterBusObject(resources.get(objectPath));
+
+		// remove the object from the resource map
 		resources.remove(objectPath);
 
-	}
+		// remove the object from the observable resources
+		observerCount.remove(objectPath);
+		// TODO if the observers was more than zero, informs the Proxy
 
-	/**
-	 * Prints the object path of the registered AllJoyn resources.
-	 */
-	public synchronized void printResources() {
-
-		if(resources.isEmpty()){
-			System.out.println("There are not registered resources");
-			return;
-		}
-		for(Map.Entry<String, CoAPResource> e : resources.entrySet()) {
-			System.out.println(e.getKey());
-		}
 	}
 
 	/**
@@ -241,6 +242,65 @@ public class AJObjectManagerApp implements Runnable {
 		response.setPayload(coapResponse.getPayload());
 
 		return response;
+	}
+
+	/**
+	 * Increments the number of observers for the specific object.
+	 * If the caller is the first observer, the method sends to the
+	 * <tt>CoAPProxy</tt> a request in order to receive future notifications
+	 * from that resource.
+	 * 
+	 * @param objectPath the object path of the observable resource
+	 */
+	public synchronized void addObserver(String objectPath) {
+
+		// check if the entry exists
+		if (!observerCount.containsKey(objectPath)) {
+			LOGGER.warning("The object "+objectPath+" does not exist.");
+			return;
+		}
+		
+		int observers = observerCount.get(objectPath);
+
+		if (observers == 0) {
+			// TODO send to the Proxy a request with the observe field
+		}
+
+		// increment the number of observers
+		observerCount.put(objectPath, observers+1);
+
+	}
+	
+	/**
+	 * Decrement the number of observer for the specific object.
+	 * If the resource remains without observers, the method informs
+	 * the <tt>CoAPProxy</tt> in order to stop receiving notifications.
+	 * 
+	 * @param objectPath the object path
+	 */
+	public synchronized void removeObserver(String objectPath) {
+		
+		// check if the entry exists
+		if (!observerCount.containsKey(objectPath)) {
+			LOGGER.warning("The object "+objectPath+" does not exist.");
+			return;
+		}
+		
+		int observers = observerCount.get(objectPath);
+		
+		// check if the object has not observers to be removed
+		if (observers == 0) {
+			LOGGER.warning("The object "+objectPath+" has not observers.");
+			return;
+		}
+		
+		observerCount.put(objectPath, observers-1);
+		
+		// if there are not observers, inform the proxy
+		if (observerCount.get(objectPath) == 0) {
+			// TODO inform the Proxy
+		}
+		
 	}
 
 	/**

@@ -96,7 +96,9 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 * @see it.dc.bridge.om.CoAPInterface#Registration()
 	 */
 	public void registration() throws BusException {
-		// TODO Auto-generated method stub
+
+		// TODO check if the caller is already an observer
+		AJObjectManagerApp.getInstance().addObserver(objectPath);
 
 	}
 
@@ -104,7 +106,9 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 * @see it.dc.bridge.om.CoAPInterface#Cancellation()
 	 */
 	public void cancellation() throws BusException {
-		// TODO Auto-generated method stub
+
+		// TODO check if the caller was an observer
+		AJObjectManagerApp.getInstance().removeObserver(objectPath);
 
 	}
 
@@ -112,7 +116,8 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 * @see it.dc.bridge.om.CoAPInterface#Notification()
 	 */
 	public void notification(ResponseMessage message) throws BusException {
-		// TODO Auto-generated method stub
+
+		// No code needed here
 
 	}
 
