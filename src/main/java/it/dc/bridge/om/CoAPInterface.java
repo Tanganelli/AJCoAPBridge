@@ -20,7 +20,7 @@ import org.alljoyn.bus.annotation.BusSignal;
  * <ul>
  * <li> {@link #registration()} registration to the resource observing service. </li>
  * <li> {@link #cancellation()} cancellation from the resource observing service. </li>
- * <li> {@link #notification()} signal that represents a resource notification. </li>
+ * <li> {@link #notification(ResponseMessage)} signal that represents a resource notification. </li>
  * </ul>
  * <p>
  * The signatures of the methods parameters reflect the attributes inside
