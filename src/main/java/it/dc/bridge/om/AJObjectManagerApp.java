@@ -184,7 +184,7 @@ public class AJObjectManagerApp implements Runnable {
 		int observers = observerCount.get(objectPath);
 
 		if (observers == 0) {
-			// TODO send to the Proxy a request with the observe field
+			CoAPProxy.getInstance().register(objectPath);
 		}
 
 		// increment the number of observers

@@ -2,7 +2,9 @@ package it.dc.bridge.proxy;
 
 import java.util.logging.Logger;
 
+import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
+import org.eclipse.californium.core.coap.MessageObserverAdapter;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -25,7 +27,7 @@ import it.dc.bridge.rd.ResourceDirectory;
  * interface, provided by the Californium <i>cf-rd</i> package. The class has been re-implemented
  * because of incompleteness.
  */
-public class CoAPProxy implements Runnable {
+public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 
 	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
@@ -65,17 +67,17 @@ public class CoAPProxy implements Runnable {
 	 * If the cache does not have a valid response, the method sends the
 	 * specific request message to the CoAP Server and returns the received response.
 	 * 
-	 * @param RDPath the resource path inside the RD
+	 * @param rdPath the resource path inside the RD
 	 * @param request the request message
 	 * @return the response message
 	 */
-	public Response callMethod(final String RDPath, final Request request) {
+	public Response callMethod(final String rdPath, final Request request) {
 
 		// take the node context from the RD (the path is unique within the RD)
-		String context = ResourceDirectory.getInstance().getContextFromResource(RDPath);
+		String context = ResourceDirectory.getInstance().getContextFromResource(rdPath);
 
 		// take the resource path within the CoAP Server from the RD
-		String path = ResourceDirectory.getInstance().getResourcePath(RDPath);
+		String path = ResourceDirectory.getInstance().getResourcePath(rdPath);
 
 		request.setURI(context+path);
 
@@ -123,6 +125,77 @@ public class CoAPProxy implements Runnable {
 		cache.cacheResponse(request, response);
 
 		return response;
+
+	}
+
+	/**
+	 * Creates a request with the observe option set to 0
+	 * and sends it to the CoAP Server with the specific resource.
+	 * 
+	 * @param rdPath the resource path inside the RD
+	 * @return true if the resource is observable, false otherwise
+	 */
+	public boolean register(String rdPath) {
+
+		Request request = new Request(Code.GET);
+
+		// take the node context from the RD (the path is unique within the RD)
+		String context = ResourceDirectory.getInstance().getContextFromResource(rdPath);
+
+		// take the resource path within the CoAP Server from the RD
+		String path = ResourceDirectory.getInstance().getResourcePath(rdPath);
+
+		request.setURI(context+path);
+
+		// set uri-host and uri-port options
+		OptionSet options = new OptionSet(request.getOptions());
+		options.setUriHost(request.getDestination().getHostAddress());
+		options.setUriPort(request.getDestinationPort());
+		request.setOptions(options);
+
+		// set the observe option
+		request.setObserve();
+
+		LOGGER.info("CoAPProxy requests for observe the resource "+path+" from "+context);
+		request.send();
+
+		Response response = null;
+
+		// wait for response
+		try {
+			response = request.waitForResponse(TIMEOUT);
+
+			// timeout
+			if (response == null) {
+				LOGGER.warning("No response received.");
+				return false;
+			}
+		} catch (InterruptedException e) {
+			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
+			return false;
+		}
+
+		// check if the CoAP Server response is success and the resource is observable
+		if (!ResponseCode.isSuccess(response.getCode()) && (response.getOptions().getObserve() == 0)) {
+			LOGGER.info("The resource "+path+" is not observable.");
+			return false;
+		}
+
+		LOGGER.info("Starting to receive notification from "+context+" for the resource "+path);
+
+		return true;
+
+	}
+
+	/**
+	 * Invoked when a response arrives.
+	 * The method informs the <tt>AJObjectManagerApp</tt> about the arrival
+	 * of a new notification.
+	 * 
+	 * @param response the notification message
+	 */
+	@Override
+	public void onResponse(Response response) {
 
 	}
 
