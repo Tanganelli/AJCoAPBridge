@@ -129,7 +129,8 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 	}
 
 	/**
-	 * Creates a request with the observe option set to 0
+	 * Registers to resource notifications.
+	 * Creates a request with the observe option set to 0 (register)
 	 * and sends it to the CoAP Server with the specific resource.
 	 * 
 	 * @param rdPath the resource path inside the RD
@@ -181,10 +182,61 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			return false;
 		}
 
-		LOGGER.info("Starting to receive notification from "+context+" for the resource "+path);
+		LOGGER.info("Start receiving notification from "+context+" for the resource "+path);
 
 		return true;
 
+	}
+	
+	/**
+	 * Unregisters from resource notifications.
+	 * Creates a request with the observe field set to 1 (unregister)
+	 * and sends it to the CoAP Server with the specific resource.
+	 * 
+	 * @param rdPath the resource path within the RD
+	 */
+	public void cancel(String rdPath) {
+		
+		Request request = new Request(Code.GET);
+
+		// take the node context from the RD (the path is unique within the RD)
+		String context = ResourceDirectory.getInstance().getContextFromResource(rdPath);
+
+		// take the resource path within the CoAP Server from the RD
+		String path = ResourceDirectory.getInstance().getResourcePath(rdPath);
+
+		request.setURI(context+path);
+
+		// set uri-host and uri-port options
+		OptionSet options = new OptionSet(request.getOptions());
+		options.setUriHost(request.getDestination().getHostAddress());
+		options.setUriPort(request.getDestinationPort());
+		request.setOptions(options);
+
+		// set the observe option to 1
+		request.setObserveCancel();
+		
+		LOGGER.info("CoAPProxy requests for stop observing the resource "+path+" from "+context);
+		request.send();
+
+		Response response = null;
+
+		// wait for response
+		try {
+			response = request.waitForResponse(TIMEOUT);
+
+			// timeout
+			if (response == null) {
+				LOGGER.warning("No response received.");
+				return;
+			}
+		} catch (InterruptedException e) {
+			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
+			return;
+		}
+
+		LOGGER.info("Stop receiving notification from "+context+" for the resource "+path);
+		
 	}
 
 	/**

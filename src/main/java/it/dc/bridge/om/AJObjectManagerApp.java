@@ -193,7 +193,7 @@ public class AJObjectManagerApp implements Runnable {
 	}
 
 	/**
-	 * Decrement the number of observer for the specific object.
+	 * Decrement the number of observers for the specific object.
 	 * If the resource remains without observers, the method informs
 	 * the <tt>CoAPProxy</tt> in order to stop receiving notifications.
 	 * 
@@ -219,7 +219,7 @@ public class AJObjectManagerApp implements Runnable {
 
 		// if there are not observers, inform the proxy
 		if (observerCount.get(objectPath) == 0) {
-			// TODO inform the Proxy
+			CoAPProxy.getInstance().cancel(objectPath);
 		}
 
 	}
