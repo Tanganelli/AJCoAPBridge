@@ -26,6 +26,8 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/** The object path. */
 	private String objectPath;
 
+	private int observers;
+
 	/**
 	 * Instantiates a new CoAP resource with an object path.
 	 *
@@ -34,6 +36,8 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public CoAPResource(String path) {
 
 		this.objectPath = path;
+
+		observers = 0;
 
 	}
 
@@ -98,7 +102,9 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public void registration() throws BusException {
 
 		// TODO check if the caller is already an observer
-		AJObjectManagerApp.getInstance().addObserver(objectPath);
+		if (observers++ == 0) {
+			AJObjectManagerApp.getInstance().addObserver(objectPath);
+		}
 
 	}
 
@@ -108,7 +114,9 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public void cancellation() throws BusException {
 
 		// TODO check if the caller was an observer
-		AJObjectManagerApp.getInstance().removeObserver(objectPath);
+		if (--observers == 0) {
+			AJObjectManagerApp.getInstance().removeObserver(objectPath);
+		}
 
 	}
 
