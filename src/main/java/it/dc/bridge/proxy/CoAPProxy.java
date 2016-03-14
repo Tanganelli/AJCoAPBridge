@@ -1,5 +1,7 @@
 package it.dc.bridge.proxy;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.californium.core.coap.CoAP.Code;
@@ -40,6 +42,9 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 
 	/* the cache */
 	private final ProxyCacheResource cache = new ProxyCacheResource(true);
+
+	/* list of observer adapters: each observable resource has its own adapter */
+	private Map<String, ObserverAdapter> observers = new ConcurrentHashMap<String,ObserverAdapter>();
 
 	/*
 	 * Since the CoAPProxy is a singleton,
@@ -182,12 +187,16 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			return false;
 		}
 
+		// add an observer adapter for the resource
+		ObserverAdapter observer = new ObserverAdapter(rdPath);
+		observers.put(rdPath,  observer);
+
 		LOGGER.info("Start receiving notification from "+context+" for the resource "+path);
 
 		return true;
 
 	}
-	
+
 	/**
 	 * Unregisters from resource notifications.
 	 * Creates a request with the observe field set to 1 (unregister)
@@ -196,7 +205,7 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 	 * @param rdPath the resource path within the RD
 	 */
 	public void cancel(String rdPath) {
-		
+
 		Request request = new Request(Code.GET);
 
 		// take the node context from the RD (the path is unique within the RD)
@@ -215,7 +224,7 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 
 		// set the observe option to 1
 		request.setObserveCancel();
-		
+
 		LOGGER.info("CoAPProxy requests for stop observing the resource "+path+" from "+context);
 		request.send();
 
@@ -234,20 +243,11 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
 			return;
 		}
+		
+		// remove the observer adapter from the map
+		observers.remove(rdPath);
 
 		LOGGER.info("Stop receiving notification from "+context+" for the resource "+path);
-		
-	}
-
-	/**
-	 * Invoked when a response arrives.
-	 * The method informs the <tt>AJObjectManagerApp</tt> about the arrival
-	 * of a new notification.
-	 * 
-	 * @param response the notification message
-	 */
-	@Override
-	public void onResponse(Response response) {
 
 	}
 
