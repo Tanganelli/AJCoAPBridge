@@ -90,7 +90,8 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 */
 	public ResponseMessage delete() throws BusException {
 
-		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, null);
+		RequestMessage request = new RequestMessage();
+		ResponseMessage response = AJObjectManagerApp.getInstance().callMethod(objectPath, RequestCode.DELETE, request);
 
 		return response;
 
