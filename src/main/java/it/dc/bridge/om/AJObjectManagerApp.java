@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import org.alljoyn.bus.AboutObj;
 import org.alljoyn.bus.BusAttachment;
 import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.BusListener;
@@ -57,8 +58,11 @@ public class AJObjectManagerApp implements Runnable {
 	/* a connection to the message bus */
 	private static BusAttachment mBus;
 
-	/* the CoAP interface for signal emitting */
+	/* the CoAP interface for send signals */
 	private static CoAPInterface objectInterface;
+
+	/* the About object to send the About data */
+	AboutObj aboutObj;
 
 	/*
 	 * Since the class is a singleton, the constructor must be private
@@ -106,6 +110,9 @@ public class AJObjectManagerApp implements Runnable {
 		SignalEmitter emitter = new SignalEmitter(resource, SignalEmitter.GlobalBroadcast.On);
 		emitters.put(objectPath, emitter);
 
+		// announce the new object to the AJ network
+		announce();
+
 	}
 
 	/**
@@ -123,6 +130,9 @@ public class AJObjectManagerApp implements Runnable {
 
 		// remove the signal emitter
 		emitters.remove(objectPath);
+
+		// send the about data
+		announce();
 
 	}
 
@@ -324,7 +334,10 @@ public class AJObjectManagerApp implements Runnable {
 			System.exit(0);
 			return;
 		}
-		LOGGER.fine("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address")); 
+		LOGGER.fine("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address"));
+
+		// create the About object
+		aboutObj = new AboutObj(mBus);
 
 		// request a well known name
 		int flags = 0; //no request name flags
@@ -381,6 +394,26 @@ public class AJObjectManagerApp implements Runnable {
 			return;
 		}
 		LOGGER.fine("BusAttachment.bindSessionPort successful");
+
+	}
+
+	/*
+	 * Sends the about data to announce the new registered object.
+	 * Before, it unannounces the previous About data.
+	 */
+	private void announce() {
+
+		Status status;
+		Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
+
+		aboutObj.unannounce();
+
+		status = aboutObj.announce(contactPort.value, new BridgeAboutData());
+		if (status != Status.OK) {
+			LOGGER.warning("Announce failed " + status.toString());
+			return;
+		}
+		LOGGER.fine("Announce called announcing SessionPort: " + contactPort.value);
 
 	}
 
