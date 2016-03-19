@@ -120,6 +120,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			if (code == ResponseCode.CREATED || code == ResponseCode.DELETED || code == ResponseCode.CHANGED) {
 				// the stored response should be invalidated if the response has
 				// codes: 2.01, 2.02, 2.04.
+				//FIXME cache key depends on payload: response of a POST does not invalidate the GET one
 				invalidateRequest(cacheKey);
 			} else if (code == ResponseCode.VALID) {
 				// increase the max-age value according to the new response
@@ -226,6 +227,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			} else {
 				LOGGER.info("Expired response");
 				invalidateRequest(cacheKey);
+				return null;
 			}
 		}
 
