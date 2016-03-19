@@ -349,7 +349,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			}
 
 			List<CacheKey> cacheKeys = new LinkedList<ProxyCacheResource.CacheKey>();
-			String uriHost = request.getOptions().getUriHost();
+			String uriHost = request.getOptions().getUriHost() + request.getOptions().getUriPathString();
 			try {
 				uriHost = URLEncoder.encode(uriHost, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
@@ -393,7 +393,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 				return fromAcceptOptions(request).get(0);
 			}
 
-			String uriHost = request.getOptions().getUriHost();
+			String uriHost = request.getOptions().getUriHost() + request.getOptions().getUriPathString();
 			Integer mediaType = response.getOptions().getContentFormat();
 			if (mediaType == MediaTypeRegistry.UNDEFINED) 
 				mediaType = MediaTypeRegistry.TEXT_PLAIN;
