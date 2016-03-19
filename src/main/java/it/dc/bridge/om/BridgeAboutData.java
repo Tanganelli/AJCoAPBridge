@@ -9,11 +9,33 @@ import org.alljoyn.bus.ErrorReplyBusException;
 import org.alljoyn.bus.Variant;
 import org.alljoyn.bus.Version;
 
+/**
+ * The class implements the <tt>AboutDataListener</tt> interface,
+ *  that supplies the list of properties required for Announce signal payload.
+ * The about data contains the basic app information like app name,
+ * device name, manufacturer, and model number.
+ * <p>
+ * The method {@link #getAnnouncedAboutData()} is called by the AllJoyn framework
+ * to get a Map where the key is a String and the value is a Variant.
+ * <p>
+ * The {@link #getAboutData(String)} method is called by the AllJoyn framework when
+ * a <tt>AboutProxy</tt> object calls <tt>AboutProxy.getAboutData()</tt> method.
+ */
 public class BridgeAboutData implements AboutDataListener {
 
 	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
 
+	/**
+	 * Get the Dictionary that is returned when a user calls <tt>org.alljoyn.About.GetAboutData</tt>.
+	 * The returned Dictionary must contain the AboutData dictionary for the language specified.
+	 * If the language parameter is null or an empty string the about data for the default language will be returned.
+	 * 
+	 * @param language a tag that specifies the required language of the data
+	 * @return a map containing the (key, value) pairs for the app properties
+	 * @throws ErrorReplyBusException if the requested language is not supported or
+	 * if unable to return the <tt>AboutData</tt> because one or more required field values can not be obtained
+	 */
 	public Map<String, Variant> getAboutData(String language) throws ErrorReplyBusException {
 
 		LOGGER.fine("MyAboutData.getAboutData was called for `" + language + "` language.");
@@ -37,6 +59,25 @@ public class BridgeAboutData implements AboutDataListener {
 		return aboutData;
 	}
 
+	/**
+	 * Return a Dictionary containing the AboutData. The Dictionary will always be the default language
+	 * and will only contain the fields that are announced.
+	 * <p>
+	 * The fields required to be part of the announced data are:
+	 * <ul>
+	 * <li>AppId</li>
+	 * <li>DefaultLanguage</li>
+	 * <li>DeviceId</li>
+	 * <li>AppName</li>
+	 * <li>Manufacturer</li>
+	 * <li>ModelNumber</li>
+	 * <li>SoftwareVersion</li>
+	 * </ul>
+	 * 
+	 * @return a map containing the (key, value) pairs for the app properties
+	 * @throws ErrorReplyBusException if unable to return the announced <tt>AboutData</tt>
+	 *  because one or more required field values can not be obtained
+	 */
 	public Map<String, Variant> getAnnouncedAboutData() throws ErrorReplyBusException {
 
 		Map<String, Variant> aboutData = new HashMap<String, Variant>();
