@@ -67,7 +67,6 @@ public class ObserverThread extends Thread {
 			}
 			if(response != null) {
 				CoAPProxy.getInstance().cacheResponse(request, response);
-				System.out.println("Observing: code="+response.getCode()+" payload="+response.getPayloadString());
 				AJObjectManagerApp.getInstance().notify(resource, response);
 			}
 

@@ -18,8 +18,8 @@ import org.alljoyn.bus.annotation.BusSignal;
  * In addition to them, the interface implements the methods and the signal
  * for the observing service:
  * <ul>
- * <li> {@link #registration()} registration to the resource observing service. </li>
- * <li> {@link #cancellation()} cancellation from the resource observing service. </li>
+ * <li> {@link #registration(String)} registration to the resource observing service. </li>
+ * <li> {@link #cancellation(String)} cancellation from the resource observing service. </li>
  * <li> {@link #notification(ResponseMessage)} signal that represents a resource notification. </li>
  * </ul>
  * <p>
@@ -76,19 +76,21 @@ public interface CoAPInterface {
 	 * The registration method is invoked by an AJ application
 	 * that wants to registers to a resource notification.
 	 *
+	 * @param uniqueName the unique name of the AllJoyn client
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="registration")
-	public void registration() throws BusException;
+	@BusMethod (name="registration", signature="s")
+	public void registration(String uniqueName) throws BusException;
 
 	/**
 	 * The cancellation method is invoked by an AJ application
 	 * that wants to unregister from a resource notification.
 	 *
+	 * @param uniqueName the unique name of the AllJoyn client
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="cancellation")
-	public void cancellation() throws BusException;
+	@BusMethod (name="cancellation", signature="s")
+	public void cancellation(String uniqueName) throws BusException;
 
 	/**
 	 * Notification is a signal sent by the AJ object when it

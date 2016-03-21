@@ -1,5 +1,7 @@
 package it.dc.bridge.om;
 
+import java.util.ArrayList;
+
 import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.BusObject;
 
@@ -26,7 +28,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/** The object path. */
 	private String objectPath;
 
-	private int observers;
+	private ArrayList<String> observers = new ArrayList<String>();
 
 	/**
 	 * Instantiates a new CoAP resource with an object path.
@@ -36,8 +38,6 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public CoAPResource(String path) {
 
 		this.objectPath = path;
-
-		observers = 0;
 
 	}
 
@@ -100,11 +100,16 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Registration()
 	 */
-	public void registration() throws BusException {
+	public void registration(String uniqueName) throws BusException {
 
-		// TODO check if the caller is already an observer
-		if (observers++ == 0) {
-			AJObjectManagerApp.getInstance().addObserver(objectPath);
+		// if the list is empty register to the resource
+		if (observers.isEmpty()) {
+			AJObjectManagerApp.getInstance().register(objectPath);
+		}
+		
+		// if the client is not present, add it to the observer list
+		if (!observers.contains(uniqueName)) {
+			observers.add(uniqueName);
 		}
 
 	}
@@ -112,11 +117,11 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Cancellation()
 	 */
-	public void cancellation() throws BusException {
+	public void cancellation(String uniqueName) throws BusException {
 
-		// TODO check if the caller was an observer
-		if (--observers == 0) {
-			AJObjectManagerApp.getInstance().removeObserver(objectPath);
+		// remove the client from the list and if the list remains empty unregister
+		if (observers.remove(uniqueName) && observers.isEmpty()) {
+			AJObjectManagerApp.getInstance().cancel(objectPath);
 		}
 
 	}

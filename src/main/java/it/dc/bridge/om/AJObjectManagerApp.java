@@ -172,7 +172,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * 
 	 * @param objectPath the object path of the observable resource
 	 */
-	public synchronized void addObserver(String objectPath) {
+	public synchronized void register(String objectPath) {
 
 		CoAPProxy.getInstance().register(objectPath);
 
@@ -183,7 +183,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * 
 	 * @param objectPath the object path
 	 */
-	public synchronized void removeObserver(String objectPath) {
+	public synchronized void cancel(String objectPath) {
 
 		CoAPProxy.getInstance().cancel(objectPath);
 
@@ -205,6 +205,8 @@ public class AJObjectManagerApp implements Runnable {
 		// get the object signal emitter
 		SignalEmitter emitter = emitters.get(objectPath);
 		objectInterface = emitter.getInterface(CoAPInterface.class);
+
+		System.out.println("Notification: code="+message.getCode()+" payload="+message.getPayloadString());
 
 		try {
 			// send the notification
