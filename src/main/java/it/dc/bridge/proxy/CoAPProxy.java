@@ -1,7 +1,5 @@
 package it.dc.bridge.proxy;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.californium.core.coap.CoAP.Code;
@@ -42,9 +40,6 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 
 	/* the cache */
 	private final ProxyCacheResource cache = new ProxyCacheResource(true);
-
-	/* list of observer adapters: each observable resource has its own adapter */
-	private Map<String, ObserverAdapter> observers = new ConcurrentHashMap<String,ObserverAdapter>();
 
 	/*
 	 * Since the CoAPProxy is a singleton,
@@ -94,11 +89,13 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 
 		Response response = null;
 
-		// check the cache for a valid response
-		response = cache.getResponse(request);
-		if (response != null) {
-			LOGGER.fine("Cache returned "+response);
-			return response;
+		if (request.getCode() == Code.GET) {
+			// check the cache for a valid response
+			response = cache.getResponse(request);
+			if (response != null) {
+				LOGGER.fine("Cache returned "+response);
+				return response;
+			}
 		}
 
 		LOGGER.info("CoAP Proxy sends a "+request.getCode()+" method call to "+context+" on the resource "+path);
@@ -187,10 +184,6 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			return false;
 		}
 
-		// add an observer adapter for the resource
-		ObserverAdapter observer = new ObserverAdapter(rdPath);
-		observers.put(rdPath,  observer);
-
 		LOGGER.info("Start receiving notification from "+context+" for the resource "+path);
 
 		return true;
@@ -243,12 +236,14 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
 			return;
 		}
-		
-		// remove the observer adapter from the map
-		observers.remove(rdPath);
 
 		LOGGER.info("Stop receiving notification from "+context+" for the resource "+path);
 
+	}
+
+	@Override
+	public void onResponse(Response response) {
+		System.out.println("changed");
 	}
 
 	public void run() {
