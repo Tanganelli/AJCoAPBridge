@@ -1,10 +1,10 @@
 package it.dc.bridge.proxy;
 
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
-import org.eclipse.californium.core.coap.MessageObserverAdapter;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -27,7 +27,7 @@ import it.dc.bridge.rd.ResourceDirectory;
  * interface, provided by the Californium <i>cf-rd</i> package. The class has been re-implemented
  * because of incompleteness.
  */
-public class CoAPProxy extends MessageObserverAdapter implements Runnable {
+public class CoAPProxy implements Runnable {
 
 	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
@@ -40,6 +40,9 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 
 	/* the cache */
 	private final ProxyCacheResource cache = new ProxyCacheResource(true);
+
+	/* map containing the observer thread for each observed resource */
+	private HashMap<String, ObserverThread> observers = new HashMap<String, ObserverThread>();
 
 	/*
 	 * Since the CoAPProxy is a singleton,
@@ -184,6 +187,10 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			return false;
 		}
 
+		ObserverThread observer = new ObserverThread(rdPath, request);
+		observer.start();
+		observers.put(rdPath, observer);
+
 		LOGGER.info("Start receiving notification from "+context+" for the resource "+path);
 
 		return true;
@@ -237,13 +244,25 @@ public class CoAPProxy extends MessageObserverAdapter implements Runnable {
 			return;
 		}
 
+		observers.get(rdPath).stopRunning();
+		observers.remove(rdPath);
+
 		LOGGER.info("Stop receiving notification from "+context+" for the resource "+path);
 
 	}
 
-	@Override
-	public void onResponse(Response response) {
-		System.out.println("changed");
+	/**
+	 * Inserts the specific (request, response) pair into the cache.
+	 * 
+	 * @param request the request message
+	 * @param response the response message
+	 */
+	public void cacheResponse(Request request, Response response) {
+
+		request.setResponse(response);
+		cache.cacheResponse(request, response);
+		request.setResponse(null);
+
 	}
 
 	public void run() {
