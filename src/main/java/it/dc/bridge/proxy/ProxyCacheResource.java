@@ -257,7 +257,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		for (CacheKey cachedRequest : responseCache.asMap().keySet()) {
 			Response response = responseCache.asMap().get(cachedRequest);
 
-			builder.append(cachedRequest.getUriHost().toString() + " (" + 
+			builder.append(cachedRequest.getUri().toString() + " (" + 
 					MediaTypeRegistry.toString(cachedRequest.getMediaType()) + ") > " + getRemainingLifetime(response) + " seconds | (" + cachedRequest.getMediaType() + ")\n");
 		}
 
@@ -327,7 +327,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 	 */
 	private static final class CacheKey {
 
-		private final String uriHost;
+		private final String uri;
 		private final int mediaType;
 		private Response response;
 		private final byte[] payload;
@@ -349,9 +349,10 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			}
 
 			List<CacheKey> cacheKeys = new LinkedList<ProxyCacheResource.CacheKey>();
-			String uriHost = request.getOptions().getUriHost() + request.getOptions().getUriPathString();
+			String uri = request.getOptions().getUriHost() + request.getOptions().getUriPort() + 
+					request.getOptions().getUriPathString() + request.getOptions().getUriQueryString();
 			try {
-				uriHost = URLEncoder.encode(uriHost, "UTF-8");
+				uri = URLEncoder.encode(uri, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				LOGGER.severe("UTF-8 encoding not supported: " + e.getMessage());
 			}
@@ -361,12 +362,12 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			Integer accept = request.getOptions().getAccept();
 			if (accept != MediaTypeRegistry.UNDEFINED) {
 				int mediaType = accept.intValue();
-				CacheKey cacheKey = new CacheKey(uriHost, mediaType, payload);
+				CacheKey cacheKey = new CacheKey(uri, mediaType, payload);
 				cacheKeys.add(cacheKey);
 			} else {
 				// if the accept options are not set, simply set all media types
 				for (Integer acceptType : MediaTypeRegistry.getAllMediaTypes()) {
-					CacheKey cacheKey = new CacheKey(uriHost, acceptType, payload);
+					CacheKey cacheKey = new CacheKey(uri, acceptType, payload);
 					cacheKeys.add(cacheKey);
 				}
 			}
@@ -393,22 +394,23 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 				return fromAcceptOptions(request).get(0);
 			}
 
-			String uriHost = request.getOptions().getUriHost() + request.getOptions().getUriPathString();
+			String uri = request.getOptions().getUriHost() + request.getOptions().getUriPort() + 
+					request.getOptions().getUriPathString() + request.getOptions().getUriQueryString();
 			Integer mediaType = response.getOptions().getContentFormat();
 			if (mediaType == MediaTypeRegistry.UNDEFINED) 
 				mediaType = MediaTypeRegistry.TEXT_PLAIN;
 			byte[] payload = request.getPayload();
 
 			// create the new cacheKey
-			CacheKey cacheKey = new CacheKey(uriHost, mediaType, payload);
+			CacheKey cacheKey = new CacheKey(uri, mediaType, payload);
 			cacheKey.setResponse(response);
 
 			return cacheKey;
 
 		}
 
-		public CacheKey(String uriHost, int mediaType, byte[] payload) {
-			this.uriHost = uriHost;
+		public CacheKey(String uri, int mediaType, byte[] payload) {
+			this.uri = uri;
 			this.mediaType = mediaType;
 			this.payload = payload;
 		}
@@ -435,11 +437,11 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			if (!Arrays.equals(payload, other.payload)) {
 				return false;
 			}
-			if (uriHost == null) {
-				if (other.uriHost != null) {
+			if (uri == null) {
+				if (other.uri != null) {
 					return false;
 				}
-			} else if (!uriHost.equals(other.uriHost)) {
+			} else if (!uri.equals(other.uri)) {
 				return false;
 			}
 			return true;
@@ -453,10 +455,10 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		}
 
 		/**
-		 * @return the proxyUri
+		 * @return the Uri
 		 */
-		public String getUriHost() {
-			return uriHost;
+		public String getUri() {
+			return uri;
 		}
 
 		/**
@@ -476,7 +478,7 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			int result = 1;
 			result = prime * result + mediaType;
 			result = prime * result + Arrays.hashCode(payload);
-			result = prime * result + (uriHost == null ? 0 : uriHost.hashCode());
+			result = prime * result + (uri == null ? 0 : uri.hashCode());
 			return result;
 		}
 
