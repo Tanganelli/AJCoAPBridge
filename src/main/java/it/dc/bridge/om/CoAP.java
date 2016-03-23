@@ -3,7 +3,7 @@ package it.dc.bridge.om;
 import java.nio.charset.Charset;
 
 /**
- * CoAP defines the ResponseCode constants.
+ * CoAP defines the <tt>RequestCode</tt> and <tt>ResponseCode</tt> constants.
  * It is similar to the CoAP class inside Californium,
  * but it provides only the request code and response code enumerators.
  */
@@ -13,7 +13,7 @@ public class CoAP {
 	public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
 	/**
-	 * The enumeration of request codes: GET, POST; PUT and DELETE.
+	 * The enumeration of request codes: GET, POST, PUT and DELETE.
 	 */
 	public enum RequestCode {
 
