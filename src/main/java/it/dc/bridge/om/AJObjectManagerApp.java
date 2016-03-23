@@ -195,7 +195,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * The method receives a CoAP message, translates it into a
 	 * {@link ResponseMessage} and sends this one as an AllJoyn signal.
 	 * <p>
-	 * If a client want to receive notifications, after it calls the 
+	 * If a client wants to receive notifications, after it calls the 
 	 * {@link CoAPInterface #registration(String)} method, it must add the match rule:
 	 * <tt>addMatch(rule)</tt>, where <tt>rule</tt> is a string following the DBus specification.
 	 * The rule has to specify three fields:
@@ -333,7 +333,7 @@ public class AJObjectManagerApp implements Runnable {
 	public void start() {
 
 		LOGGER.info("Starting AllJoyn server");
-		
+
 		Status status;
 
 		mBus = new BusAttachment("CoAPBridge");
