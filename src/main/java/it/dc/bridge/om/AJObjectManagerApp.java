@@ -107,7 +107,8 @@ public class AJObjectManagerApp implements Runnable {
 		resources.put(objectPath, resource);
 
 		// create a signal emitter and associate it to the object
-		SignalEmitter emitter = new SignalEmitter(resource, SignalEmitter.GlobalBroadcast.On);
+		SignalEmitter emitter = new SignalEmitter(resource, 0, SignalEmitter.GlobalBroadcast.Off);
+		emitter.setSessionlessFlag(true);
 		emitters.put(objectPath, emitter);
 
 		// announce the new object to the AJ network
@@ -193,6 +194,18 @@ public class AJObjectManagerApp implements Runnable {
 	 * Sends a notification for the specific object to the AllJoyn network.
 	 * The method receives a CoAP message, translates it into a
 	 * {@link ResponseMessage} and sends this one as an AllJoyn signal.
+	 * <p>
+	 * If a client want to receive notifications, after it calls the 
+	 * {@link CoAPInterface #registration(String)} method, it must add the match rule:
+	 * <tt>addMatch(rule)</tt>, where <tt>rule</tt> is a string following the DBus specification.
+	 * The rule has to specify three fields:
+	 * <ul>
+	 * <li><tt>interface</tt>: com.coap.rest</li>
+	 * <li><tt>path</tt>: the object path of the resource it registered</li>
+	 * <li><tt>sessionless</tt>: t (true)</li>
+	 * </ul>
+	 * If the rule is not added or not all the three fields are correctly set
+	 * the client will not receive notifications.
 	 * 
 	 * @param objectPath the object path
 	 * @param coapMessage the CoAP message to notify
@@ -205,8 +218,6 @@ public class AJObjectManagerApp implements Runnable {
 		// get the object signal emitter
 		SignalEmitter emitter = emitters.get(objectPath);
 		objectInterface = emitter.getInterface(CoAPInterface.class);
-
-		System.out.println("Notification: code="+message.getCode()+" payload="+message.getPayloadString());
 
 		try {
 			// send the notification
@@ -322,6 +333,8 @@ public class AJObjectManagerApp implements Runnable {
 	public void start() {
 
 		LOGGER.info("Starting AllJoyn server");
+		
+		Status status;
 
 		mBus = new BusAttachment("CoAPBridge");
 
@@ -330,7 +343,7 @@ public class AJObjectManagerApp implements Runnable {
 		mBus.registerBusListener(listener);
 
 		// connect to the bus
-		Status status = mBus.connect();
+		status = mBus.connect();
 		if (status != Status.OK) {
 			LOGGER.warning("BusAttachment.connect() failed: " + status);
 			System.exit(0);
