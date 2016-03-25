@@ -3,12 +3,12 @@ package it.dc.bridge.proxy;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.californium.core.CoapResource;
+import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.OptionNumberRegistry;
@@ -120,7 +120,6 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			if (code == ResponseCode.CREATED || code == ResponseCode.DELETED || code == ResponseCode.CHANGED) {
 				// the stored response should be invalidated if the response has
 				// codes: 2.01, 2.02, 2.04.
-				//FIXME cache key depends on payload: response of a POST does not invalidate the GET one
 				invalidateRequest(cacheKey);
 			} else if (code == ResponseCode.VALID) {
 				// increase the max-age value according to the new response
@@ -330,7 +329,6 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 		private final String uri;
 		private final int mediaType;
 		private Response response;
-		private final byte[] payload;
 
 		/**
 		 * Creates a list of keys for the cache from a request with multiple
@@ -356,18 +354,17 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			} catch (UnsupportedEncodingException e) {
 				LOGGER.severe("UTF-8 encoding not supported: " + e.getMessage());
 			}
-			byte[] payload = request.getPayload();
 
 			// Implementation in new Cf (Only one accept option allowed)
 			Integer accept = request.getOptions().getAccept();
 			if (accept != MediaTypeRegistry.UNDEFINED) {
 				int mediaType = accept.intValue();
-				CacheKey cacheKey = new CacheKey(uri, mediaType, payload);
+				CacheKey cacheKey = new CacheKey(uri, mediaType);
 				cacheKeys.add(cacheKey);
 			} else {
 				// if the accept options are not set, simply set all media types
 				for (Integer acceptType : MediaTypeRegistry.getAllMediaTypes()) {
-					CacheKey cacheKey = new CacheKey(uri, acceptType, payload);
+					CacheKey cacheKey = new CacheKey(uri, acceptType);
 					cacheKeys.add(cacheKey);
 				}
 			}
@@ -396,23 +393,28 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 
 			String uri = request.getOptions().getUriHost() + request.getOptions().getUriPort() + 
 					request.getOptions().getUriPathString() + request.getOptions().getUriQueryString();
-			Integer mediaType = response.getOptions().getContentFormat();
+			Integer mediaType;
+			// if it is a POST method, the media type is inside the request
+			// otherwise it is inside the response
+			if (request.getCode() == Code.POST)
+				mediaType = request.getOptions().getContentFormat();
+			else
+				mediaType = response.getOptions().getContentFormat();
+			// an empty content type will be considered the content as text plain
 			if (mediaType == MediaTypeRegistry.UNDEFINED) 
 				mediaType = MediaTypeRegistry.TEXT_PLAIN;
-			byte[] payload = request.getPayload();
 
 			// create the new cacheKey
-			CacheKey cacheKey = new CacheKey(uri, mediaType, payload);
+			CacheKey cacheKey = new CacheKey(uri, mediaType);
 			cacheKey.setResponse(response);
 
 			return cacheKey;
 
 		}
 
-		public CacheKey(String uri, int mediaType, byte[] payload) {
+		public CacheKey(String uri, int mediaType) {
 			this.uri = uri;
 			this.mediaType = mediaType;
-			this.payload = payload;
 		}
 
 		/*
@@ -432,9 +434,6 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			}
 			CacheKey other = (CacheKey) obj;
 			if (mediaType != other.mediaType) {
-				return false;
-			}
-			if (!Arrays.equals(payload, other.payload)) {
 				return false;
 			}
 			if (uri == null) {
@@ -477,7 +476,6 @@ public class ProxyCacheResource extends CoapResource implements CacheResource {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + mediaType;
-			result = prime * result + Arrays.hashCode(payload);
 			result = prime * result + (uri == null ? 0 : uri.hashCode());
 			return result;
 		}
