@@ -145,6 +145,9 @@ public class CoAPProxy implements Runnable {
 	public Status register(String rdPath) {
 
 		Request request = new Request(Code.GET);
+		
+		// set confirmable
+		request.setConfirmable(true);
 
 		// take the node context from the RD (the path is unique within the RD)
 		String context = ResourceDirectory.getInstance().getContextFromResource(rdPath);
