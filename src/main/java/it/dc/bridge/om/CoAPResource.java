@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.BusObject;
+import org.alljoyn.bus.Status;
 
 import it.dc.bridge.om.CoAP.RequestCode;
 
@@ -100,17 +101,22 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Registration()
 	 */
-	public void registration(String uniqueName) throws BusException {
+	public Status registration(String uniqueName) throws BusException {
 
+		// TODO extend observing as in 1.4 RFC 7641
+		Status status = null;
+		
 		// if the list is empty register to the resource
 		if (observers.isEmpty()) {
-			AJObjectManagerApp.getInstance().register(objectPath);
+			status = AJObjectManagerApp.getInstance().register(objectPath);
 		}
-		
+
 		// if the client is not present, add it to the observer list
-		if (!observers.contains(uniqueName)) {
+		if (status == Status.OK && !observers.contains(uniqueName)) {
 			observers.add(uniqueName);
 		}
+
+		return status;
 
 	}
 

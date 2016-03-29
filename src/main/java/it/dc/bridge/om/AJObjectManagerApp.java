@@ -172,10 +172,11 @@ public class AJObjectManagerApp implements Runnable {
 	 * future notifications from that resource.
 	 * 
 	 * @param objectPath the object path of the observable resource
+	 * @return status code
 	 */
-	public synchronized void register(String objectPath) {
+	public synchronized Status register(String objectPath) {
 
-		CoAPProxy.getInstance().register(objectPath);
+		return CoAPProxy.getInstance().register(objectPath);
 
 	}
 

@@ -3,6 +3,7 @@ package it.dc.bridge.proxy;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import org.alljoyn.bus.Status;
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.OptionSet;
@@ -141,7 +142,7 @@ public class CoAPProxy implements Runnable {
 	 * @param rdPath the resource path inside the RD
 	 * @return true if the resource is observable, false otherwise
 	 */
-	public boolean register(String rdPath) {
+	public Status register(String rdPath) {
 
 		Request request = new Request(Code.GET);
 
@@ -174,17 +175,17 @@ public class CoAPProxy implements Runnable {
 			// timeout
 			if (response == null) {
 				LOGGER.warning("No response received.");
-				return false;
+				return Status.TIMEOUT;
 			}
 		} catch (InterruptedException e) {
 			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
-			return false;
+			return Status.FAIL;
 		}
 
 		// check if the CoAP Server response is success and the resource is observable
 		if (!ResponseCode.isSuccess(response.getCode()) && (response.getOptions().getObserve() == 0)) {
 			LOGGER.info("The resource "+path+" is not observable.");
-			return false;
+			return Status.NOT_IMPLEMENTED;
 		}
 
 		ObserverThread observer = new ObserverThread(rdPath, request);
@@ -193,7 +194,7 @@ public class CoAPProxy implements Runnable {
 
 		LOGGER.info("Start receiving notification from "+context+" for the resource "+path);
 
-		return true;
+		return Status.OK;
 
 	}
 
@@ -201,6 +202,13 @@ public class CoAPProxy implements Runnable {
 	 * Unregisters from resource notifications.
 	 * Creates a request with the observe field set to 1 (unregister)
 	 * and sends it to the CoAP Server with the specific resource.
+	 * <p>
+	 * A client that is no longer interested in receiving notifications for 
+	 * a resource can simply "forget" the observation.
+	 * First, the <tt>CoAPProxy</tt> explicitly deregisters by issuing a GET
+	 * request that includes an Observe Option with the value set to 1 (deregister).
+	 * Then, even if problems occur, it stops receiving notification
+	 * killing the <tt>ObserverThread</tt>.
 	 * 
 	 * @param rdPath the resource path within the RD
 	 */
@@ -237,11 +245,9 @@ public class CoAPProxy implements Runnable {
 			// timeout
 			if (response == null) {
 				LOGGER.warning("No response received.");
-				return;
 			}
 		} catch (InterruptedException e) {
 			LOGGER.severe("Receiving of response interrupted: " + e.getMessage());
-			return;
 		}
 
 		observers.get(rdPath).stopRunning();

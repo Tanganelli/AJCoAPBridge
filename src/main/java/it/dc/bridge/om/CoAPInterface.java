@@ -1,6 +1,7 @@
 package it.dc.bridge.om;
 
 import org.alljoyn.bus.BusException;
+import org.alljoyn.bus.Status;
 import org.alljoyn.bus.annotation.BusInterface;
 import org.alljoyn.bus.annotation.BusMethod;
 import org.alljoyn.bus.annotation.BusSignal;
@@ -77,10 +78,11 @@ public interface CoAPInterface {
 	 * that wants to registers to a resource notification.
 	 *
 	 * @param uniqueName the unique name of the AllJoyn client
+	 * @return the status of the registration
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="registration", signature="s")
-	public void registration(String uniqueName) throws BusException;
+	@BusMethod (name="registration", signature="s", replySignature="i")
+	public Status registration(String uniqueName) throws BusException;
 
 	/**
 	 * The cancellation method is invoked by an AJ application
