@@ -3,6 +3,7 @@ package it.dc.bridge.om;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -58,11 +59,50 @@ public class AJObjectManagerApp implements Runnable {
 	/* a connection to the message bus */
 	private static BusAttachment mBus;
 
+	/* the bus listener */
+	private static BusListener busListener;
+
 	/* the CoAP interface for send signals */
 	private static CoAPInterface objectInterface;
 
 	/* the About object to send the About data */
 	AboutObj aboutObj;
+
+	/**
+	 * The thread will run on application closing.
+	 * It deals with objects unregistration and bus disconnection.
+	 */
+	private class OnCloseThread extends Thread {
+
+		public void run() {
+
+			Status status;
+
+			// unannounce About object
+			status = aboutObj.unannounce();
+			if (status != Status.OK) {
+				LOGGER.warning("Error unannouncing About object.");
+			}
+
+			// unregister objects
+			for(Entry<String, CoAPResource> e : resources.entrySet()) {
+				mBus.unregisterBusObject(e.getValue());
+			}
+
+			// unregister bus listener
+			mBus.unregisterBusListener(busListener);
+
+			// cancel the advertise name
+			status = mBus.cancelAdvertiseName("com.bridge.coap", SessionOpts.TRANSPORT_ANY);
+			if (status != Status.OK) {
+				LOGGER.warning("Error canceling advertised name.");
+			}
+
+			// disconnect from the Bus
+			mBus.disconnect();
+
+		}
+	}
 
 	/*
 	 * Since the class is a singleton, the constructor must be private
@@ -178,7 +218,7 @@ public class AJObjectManagerApp implements Runnable {
 	public synchronized Status register(String objectPath, CoAPRequestMessage request) {
 
 		Request coapRequest = getRequest(RequestCode.GET, request);
-		
+
 		return CoAPProxy.getInstance().register(objectPath, coapRequest);
 
 	}
@@ -343,8 +383,8 @@ public class AJObjectManagerApp implements Runnable {
 		mBus = new BusAttachment("CoAPBridge");
 
 		// register bus listener
-		BusListener listener = new BusListener();
-		mBus.registerBusListener(listener);
+		busListener = new BusListener();
+		mBus.registerBusListener(busListener);
 
 		// connect to the bus
 		status = mBus.connect();
@@ -387,6 +427,10 @@ public class AJObjectManagerApp implements Runnable {
 
 		// bind session port with the session options
 		objectManager.bindSessionPort(contactPort, sessionOpts);
+
+		// add the OnCloseThread at the shutdown
+		// TODO actually, it's not possible to exit from the Bridge
+		Runtime.getRuntime().addShutdownHook(new OnCloseThread());
 
 	}
 

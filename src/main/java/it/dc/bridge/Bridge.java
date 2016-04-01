@@ -40,9 +40,11 @@ public class Bridge {
 		ResourceDirectory resourceDirectory = ResourceDirectory.getInstance();
 		AJObjectManagerApp objectManager = AJObjectManagerApp.getInstance();
 
+		// start the Resource Directory
 		resourceDirectory.run();
 
-		objectManager.run();		
+		// start the AllJoyn Object Manager
+		objectManager.run();
 
 	}
 
