@@ -101,14 +101,15 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/* (non-Javadoc)
 	 * @see it.dc.bridge.om.CoAPInterface#Registration()
 	 */
-	public Status registration(String uniqueName) throws BusException {
+	public Status registration(String uniqueName, final RequestMessage request) throws BusException {
 
 		// TODO extend observing as in 1.4 RFC 7641
 		Status status = null;
 		
 		// if the list is empty register to the resource
+		// FIXME it depends also on the request message fields
 		if (observers.isEmpty()) {
-			status = AJObjectManagerApp.getInstance().register(objectPath);
+			status = AJObjectManagerApp.getInstance().register(objectPath, request);
 		}
 
 		// if the client is not present, add it to the observer list

@@ -140,14 +140,10 @@ public class CoAPProxy implements Runnable {
 	 * and sends it to the CoAP Server with the specific resource.
 	 * 
 	 * @param rdPath the resource path inside the RD
+	 * @param request the request message
 	 * @return true if the resource is observable, false otherwise
 	 */
-	public Status register(String rdPath) {
-
-		Request request = new Request(Code.GET);
-		
-		// set confirmable
-		request.setConfirmable(true);
+	public Status register(String rdPath, Request request) {
 
 		// take the node context from the RD (the path is unique within the RD)
 		String context = ResourceDirectory.getInstance().getContextFromResource(rdPath);
