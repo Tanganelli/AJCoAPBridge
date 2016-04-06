@@ -29,16 +29,26 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/** The object path. */
 	private String objectPath;
 
+	/** The Resource Type */
+	private String resourceType;
+
+	/** The Interface Description */
+	private String interfaceDescription;
+
 	private ArrayList<String> observers = new ArrayList<String>();
 
 	/**
 	 * Instantiates a new CoAP resource with an object path.
 	 *
 	 * @param path the object path
+	 * @param resourceType the Resource Type
+	 * @param interfaceDescription the Interface Description
 	 */
-	public CoAPResource(String path) {
+	public CoAPResource(String path, String resourceType, String interfaceDescription) {
 
 		this.objectPath = path;
+		this.resourceType = resourceType;
+		this.interfaceDescription = interfaceDescription;
 
 	}
 
@@ -105,7 +115,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 
 		// TODO extend observing as in 1.4 RFC 7641
 		Status status = null;
-		
+
 		// if the list is empty register to the resource
 		// FIXME it depends also on the request message fields
 		if (observers.isEmpty()) {
@@ -139,6 +149,24 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public void notification(ResponseMessage message) throws BusException {
 
 		// No code needed here
+
+	}
+
+	/* (non-Javadoc)
+	 * @see it.dc.bridge.om.CoAPInterface#getResourceType()
+	 */
+	public String getResourceType() {
+
+		return resourceType;
+
+	}
+
+	/* (non-Javadoc)
+	 * @see it.dc.bridge.om.CoAPInterface#getInterfaceDescription
+	 */
+	public String getInterfaceDescription() {
+
+		return interfaceDescription;
 
 	}
 

@@ -4,6 +4,7 @@ import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.Status;
 import org.alljoyn.bus.annotation.BusInterface;
 import org.alljoyn.bus.annotation.BusMethod;
+import org.alljoyn.bus.annotation.BusProperty;
 import org.alljoyn.bus.annotation.BusSignal;
 
 /**
@@ -105,5 +106,26 @@ public interface CoAPInterface {
 	 */
 	@BusSignal (name="notification", signature="r")
 	public void notification(ResponseMessage message) throws BusException;
+	
+	/**
+	 * The Resource Type <i>rt</i> attribute is an opaque string used to assign
+	 * an application-specific semantic type to a resource.
+	 * 
+	 * @return the Resource Type field
+	 * @throws BusException AllJoyn bus exception
+	 */
+	@BusProperty (name="getResourceType")
+	public String getResourceType() throws BusException;
+	
+	/**
+	 * The Interface Description <i>if</i> attribute is an opaque string used to
+	 * provide a name or URI indicating a specific interface definition used
+	 * to interact with the target resource.
+	 * 
+	 * @return the Interface Description field
+	 * @throws BusException AllJoyn bus exception
+	 */
+	@BusProperty (name="getInterfaceDescription")
+	public String getInterfaceDescription() throws BusException;
 
 }

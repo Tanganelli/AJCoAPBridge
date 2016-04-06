@@ -193,7 +193,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		}
 
 		// inform the Object Manager about the new resource
-		AJObjectManagerApp.getInstance().addResource(resource.getURI());
+		AJObjectManagerApp.getInstance().addResource(resource.getURI(), type, interfaceDes);
 
 	}
 
