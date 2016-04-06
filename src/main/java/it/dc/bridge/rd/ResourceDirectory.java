@@ -30,7 +30,7 @@ import it.dc.bridge.om.AJObjectManagerApp;
  * and the <tt>CoAPProxy</tt>.
  */ 
 public class ResourceDirectory extends CoapServer implements Runnable {
-	
+
 	/* the logger */
 	private static final Logger LOGGER = Logger.getGlobal();
 
@@ -44,6 +44,10 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	private Map<String, String> contexts = new ConcurrentHashMap<String, String>();
 	/* Map containing the <resource, node> pair for each registered resource */
 	private Map<String, String> resources = new ConcurrentHashMap<String, String>();
+	/* Map containing the <resource, type> pair for each registered resource */
+	private Map<String, String> resourceType = new ConcurrentHashMap<String, String>();
+	/* Map containing the <resource, interface> pair for each registered resource */
+	private Map<String, String> interfaceDescription = new ConcurrentHashMap<String, String>();
 	/* Map containing the <resource, path> pair for each registered resource */
 	private Map<String, String> paths = new ConcurrentHashMap<String, String>();
 
@@ -166,6 +170,28 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		String path = resource.getURI().substring(node.getURI().length());
 		paths.put(resource.getURI(), path);
 
+		/*
+		 * if present, put the resource types in the map
+		 */
+		String type = null;
+		if(!resource.getAttributes().getResourceTypes().isEmpty()) {
+			type = resource.getAttributes().getResourceTypes().get(0);
+		}
+		if (type != null) {
+			resourceType.put(resource.getURI(), type);
+		}
+
+		/*
+		 * if present, put the interface description in the map
+		 */
+		String interfaceDes = null;
+		if(!resource.getAttributes().getResourceTypes().isEmpty()) {
+			interfaceDes = resource.getAttributes().getInterfaceDescriptions().get(0);
+		}
+		if (interfaceDes != null) {
+			interfaceDescription.put(resource.getURI(), interfaceDes);
+		}
+
 		// inform the Object Manager about the new resource
 		AJObjectManagerApp.getInstance().addResource(resource.getURI());
 
@@ -186,6 +212,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 			if(e.getValue().equals(nodeID)) {
 				resources.remove(e.getKey());
 				paths.remove(e.getKey());
+				resourceType.remove(e.getKey());
 
 				// inform the Object Manager about the resource removal
 				AJObjectManagerApp.getInstance().removeResource(e.getKey());
