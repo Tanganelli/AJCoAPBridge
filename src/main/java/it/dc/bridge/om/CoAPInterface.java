@@ -33,7 +33,7 @@ import org.alljoyn.bus.annotation.BusSignal;
  * @see RequestMessage
  * @see ResponseMessage
  */
-@BusInterface (name="com.coap.rest", announced="true")
+@BusInterface (name="com.coap.rest", announced="true", descriptionLanguage="en", description="RESTful CoAP interface")
 public interface CoAPInterface {
 
 	/**
@@ -46,7 +46,7 @@ public interface CoAPInterface {
 	 * the message contains 2.05 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="get", signature="r", replySignature="r")
+	@BusMethod (name="get", signature="r", replySignature="r", description="Send a GET method call")
 	public ResponseMessage get(RequestMessage request) throws BusException;
 
 	/**
@@ -59,7 +59,7 @@ public interface CoAPInterface {
 	 * the message contains 2.04 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="post", signature="r", replySignature="r")
+	@BusMethod (name="post", signature="r", replySignature="r", description="Send a POST method call")
 	public ResponseMessage post(RequestMessage request) throws BusException;
 
 	/**
@@ -71,7 +71,7 @@ public interface CoAPInterface {
 	 * the message contains 2.02 as response code.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="delete", replySignature="r")
+	@BusMethod (name="delete", replySignature="r", description="Send a DELETE method call")
 	public ResponseMessage delete() throws BusException;
 
 	/**
@@ -83,7 +83,7 @@ public interface CoAPInterface {
 	 * @return the status of the registration
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="registration", signature="sr", replySignature="i")
+	@BusMethod (name="registration", signature="sr", replySignature="i", description="Start to observe the resource")
 	public Status registration(String uniqueName, RequestMessage request) throws BusException;
 
 	/**
@@ -93,7 +93,7 @@ public interface CoAPInterface {
 	 * @param uniqueName the unique name of the AllJoyn client
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusMethod (name="cancellation", signature="s")
+	@BusMethod (name="cancellation", signature="s", description="Stop to observe the resource")
 	public void cancellation(String uniqueName) throws BusException;
 
 	/**
@@ -104,7 +104,7 @@ public interface CoAPInterface {
 	 * the resource representation.
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusSignal (name="notification", signature="r")
+	@BusSignal (name="notification", signature="r", description="A notification arrived")
 	public void notification(ResponseMessage message) throws BusException;
 	
 	/**
@@ -114,7 +114,7 @@ public interface CoAPInterface {
 	 * @return the Resource Type field
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusProperty (name="getResourceType")
+	@BusProperty (name="getResourceType", description="Returns the Resource Type field")
 	public String getResourceType() throws BusException;
 	
 	/**
@@ -125,7 +125,7 @@ public interface CoAPInterface {
 	 * @return the Interface Description field
 	 * @throws BusException AllJoyn bus exception
 	 */
-	@BusProperty (name="getInterfaceDescription")
+	@BusProperty (name="getInterfaceDescription", description="Returns the Interface Description field")
 	public String getInterfaceDescription() throws BusException;
 
 }

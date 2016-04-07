@@ -1,0 +1,56 @@
+<!DOCTYPE node PUBLIC "-//allseen//DTD ALLJOYN Object Introspection 1.0//EN"
+"http://www.allseen.org/alljoyn/introspect-1.0.dtd">
+<node>
+  <interface name="com.coap.rest">
+    <description>RESTful CoAP interface</description>
+    <method name="get">
+      <description>Send a GET method call</description>
+      <arg name="request" type="((iaayiaaybi)a{ss}ay)" direction="in"/>
+      <arg name="response" type="(i(iaayiaaybi)ay)" direction="out"/>
+    </method>
+    <method name="post">
+      <description>Send a POST method call</description>
+      <arg name="request" type="((iaayiaaybi)a{ss}ay)" direction="in"/>
+      <arg name="response" type="(i(iaayiaaybi)ay)" direction="out"/>
+    </method>
+    <method name="delete">
+      <description>Send a DELETE method call</description>
+      <arg name="response" type="(i(iaayiaaybi)ay)" direction="out"/>
+    </method>
+    <method name="registration">
+      <description>Start to observe the resource</description>
+      <arg name="uniqueName" type="s" direction="in"/>
+      <arg name="request" type="((iaayiaaybi)a{ss}ay)" direction="in"/>
+      <arg name="status" type="i" direction="out"/>
+    </method>
+    <method name="cancellation">
+      <description>Stop to observe the resource</description>
+      <arg name="uniqueName" type="s" direction="in"/>
+    </method>
+    <signal name="notification" sessionless="false">
+      <description>A notification arrived</description>
+      <arg name="message" type="(i(iaayiaaybi)ay)" direction="out"/>
+    </signal>
+    <property name="getResourceType" type="s" access="read">
+      <description>Returns the Resource Type field</description>
+    </property>
+    <property name="getInterfaceDescription" type="s" access="read">
+      <description>Returns the Interface Description field</description>
+    </property>
+  </interface>
+  <interface name="org.freedesktop.DBus.Introspectable">
+    <method name="Introspect">
+      <arg name="data" type="s" direction="out"/>
+    </method>
+  </interface>
+  <interface name="org.allseen.Introspectable">
+    <method name="GetDescriptionLanguages">
+      <arg name="languageTags" type="as" direction="out"/>
+    </method>
+    <method name="IntrospectWithDescription">
+      <arg name="languageTag" type="s" direction="in"/>
+      <arg name="data" type="s" direction="out"/>
+    </method>
+    <annotation name="org.alljoyn.Bus.Secure" value="off"/>
+  </interface>
+</node>
