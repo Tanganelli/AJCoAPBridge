@@ -429,6 +429,13 @@ public class AJObjectManagerApp implements Runnable {
 
 		// bind session port with the session options
 		objectManager.bindSessionPort(contactPort, sessionOpts);
+		
+		status = aboutObj.announce(contactPort.value, new BridgeAboutData());
+		if (status != Status.OK) {
+			LOGGER.warning("Announce failed " + status.toString());
+			return;
+		}
+		LOGGER.fine("Announce called announcing SessionPort: " + contactPort.value);
 
 		// add the OnCloseThread at the shutdown
 		// TODO actually, it's not possible to exit from the Bridge
