@@ -24,8 +24,8 @@ public class Options {
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
 	@Position(1)
-	@Signature("ar")
-	public ETag[] etags;
+	@Signature("as")
+	public String[] etags;
 
 	/** Which Content-Format is acceptable to the client. */
 	@Position(2)
@@ -35,8 +35,8 @@ public class Options {
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
 	@Position(3)
-	@Signature("ar")
-	public ETag[] ifMatch;
+	@Signature("as")
+	public String[] ifMatch;
 
 	/** To make a request conditional on the nonexistence of the target resource. */
 	@Position(4)
@@ -123,8 +123,8 @@ public class Options {
 		
 		List<byte[]> ret = new ArrayList<byte[]>();
 		
-		for (ETag e : etags)
-			ret.add(e.getEtag());
+		for (String e : etags)
+			ret.add(e.getBytes());
 		
 		return ret;
 		
@@ -153,11 +153,11 @@ public class Options {
 		
 		if(etag == null){
 			// AJ does not allow null value (signature is "aay")
-			this.etags = new ETag[]{};
+			this.etags = new String[]{};
 		}else {
-			this.etags = new ETag[etag.size()];
+			this.etags = new String[etag.size()];
 			for (int i = 0; i < etag.size(); i++) {
-				this.etags[i] = new ETag(etag.get(i));
+				this.etags[i] = new String(etag.get(i));
 			}
 		}
 		
@@ -208,8 +208,8 @@ public class Options {
 		
 		List<byte[]> ret = new ArrayList<byte[]>();
 		
-		for (ETag e : ifMatch)
-			ret.add(e.getEtag());
+		for (String e : ifMatch)
+			ret.add(e.getBytes());
 		
 		return ret;
 		
@@ -238,11 +238,11 @@ public class Options {
 
 		if(ifMatch == null){
 			// AJ does not allow null value (signature is "aay")
-			this.ifMatch = new ETag[]{};
+			this.ifMatch = new String[]{};
 		}else {
-			this.ifMatch = new ETag[ifMatch.size()];
+			this.ifMatch = new String[ifMatch.size()];
 			for (int i = 0; i < ifMatch.size(); i++) {
-				this.ifMatch[i] = new ETag(ifMatch.get(i));
+				this.ifMatch[i] = new String(ifMatch.get(i));
 			}
 		}
 		
