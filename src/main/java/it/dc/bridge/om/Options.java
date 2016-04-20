@@ -1,11 +1,10 @@
 package it.dc.bridge.om;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.alljoyn.bus.annotation.Position;
 import org.alljoyn.bus.annotation.Signature;
-import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 /**
  * The Options class is a collection of CoAP option fields.
@@ -13,7 +12,10 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
  * This class contains only the options used in the AllJoyn network.
  */
 public class Options {
-
+	
+	/** the undefined value */
+	private static final int UNDEFINED = -1;
+	
 	/** Representation format of the message payload. */
 	@Position(0)
 	@Signature("i")
@@ -22,8 +24,8 @@ public class Options {
 	/** Resource-local identifier for differentiating
 	 * between representations of the same resource that vary over time. */
 	@Position(1)
-	@Signature("aay")
-	public byte[][] etag;
+	@Signature("ar")
+	public ETag[] etags;
 
 	/** Which Content-Format is acceptable to the client. */
 	@Position(2)
@@ -33,8 +35,8 @@ public class Options {
 	/** To make a request conditional on the current
 	 * existence or the value of an ETag. */
 	@Position(3)
-	@Signature("aay")
-	public byte[][] ifMatch;
+	@Signature("ar")
+	public ETag[] ifMatch;
 
 	/** To make a request conditional on the nonexistence of the target resource. */
 	@Position(4)
@@ -94,7 +96,7 @@ public class Options {
 	 */
 	public boolean hasContentFormat() {
 		
-		return contentFormat != MediaTypeRegistry.UNDEFINED;
+		return contentFormat != UNDEFINED;
 		
 	}
 
@@ -105,7 +107,7 @@ public class Options {
 	 */
 	public void setContentFormat(Integer contentFormat) {
 		
-		this.contentFormat = (contentFormat != null) ? contentFormat : MediaTypeRegistry.UNDEFINED;
+		this.contentFormat = (contentFormat != null) ? contentFormat : UNDEFINED;
 		
 	}
 
@@ -119,7 +121,12 @@ public class Options {
 	 */
 	public List<byte[]> getEtag() {
 		
-		return Arrays.asList(this.etag);
+		List<byte[]> ret = new ArrayList<byte[]>();
+		
+		for (ETag e : etags)
+			ret.add(e.getEtag());
+		
+		return ret;
 		
 	}
 
@@ -146,10 +153,12 @@ public class Options {
 		
 		if(etag == null){
 			// AJ does not allow null value (signature is "aay")
-			this.etag = new byte[][]{};
+			this.etags = new ETag[]{};
 		}else {
-			this.etag = new byte[etag.size()][];
-			this.etag = etag.toArray(this.etag);
+			this.etags = new ETag[etag.size()];
+			for (int i = 0; i < etag.size(); i++) {
+				this.etags[i] = new ETag(etag.get(i));
+			}
 		}
 		
 	}
@@ -172,7 +181,7 @@ public class Options {
 	 */
 	public boolean hasAccept() {
 		
-		return accept != MediaTypeRegistry.UNDEFINED;
+		return accept != UNDEFINED;
 		
 	}
 
@@ -183,7 +192,7 @@ public class Options {
 	 */
 	public void setAccept(Integer accept) {
 		
-		this.accept = (accept != null) ? accept : MediaTypeRegistry.UNDEFINED;
+		this.accept = (accept != null) ? accept : UNDEFINED;
 		
 	}
 
@@ -197,7 +206,12 @@ public class Options {
 	 */
 	public List<byte[]> getIfMatch() {
 		
-		return Arrays.asList(this.ifMatch);
+		List<byte[]> ret = new ArrayList<byte[]>();
+		
+		for (ETag e : ifMatch)
+			ret.add(e.getEtag());
+		
+		return ret;
 		
 	}
 
@@ -224,10 +238,12 @@ public class Options {
 
 		if(ifMatch == null){
 			// AJ does not allow null value (signature is "aay")
-			this.ifMatch = new byte[][]{};
+			this.ifMatch = new ETag[]{};
 		}else {
-			this.ifMatch = new byte[ifMatch.size()][];
-			this.ifMatch = ifMatch.toArray(this.ifMatch);
+			this.ifMatch = new ETag[ifMatch.size()];
+			for (int i = 0; i < ifMatch.size(); i++) {
+				this.ifMatch[i] = new ETag(ifMatch.get(i));
+			}
 		}
 		
 	}
