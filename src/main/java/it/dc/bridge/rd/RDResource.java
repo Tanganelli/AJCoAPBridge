@@ -116,7 +116,7 @@ public class RDResource extends CoapResource {
 			return; 
 		} 
 
-		LOGGER.fine("Adding new endpoint: "+resource.getContext());
+		LOGGER.info("Adding new endpoint: "+resource.getContext());
 
 		String location = resource.getURI();
 

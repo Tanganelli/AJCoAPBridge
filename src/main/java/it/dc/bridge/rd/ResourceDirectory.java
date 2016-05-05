@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.californium.core.CoapResource;
@@ -50,6 +51,8 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	private Map<String, String> interfaceDescription = new ConcurrentHashMap<String, String>();
 	/* Map containing the <resource, path> pair for each registered resource */
 	private Map<String, String> paths = new ConcurrentHashMap<String, String>();
+	
+	private static RDResource rdResource;
 
 	/*
 	 * Instantiates a new Resource Directory and adds to it the <i>/rd</i> resource.
@@ -57,7 +60,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 */
 	private ResourceDirectory() {
 
-		RDResource rdResource = new RDResource(); 
+		rdResource = new RDResource(); 
 
 		// add the rd resource to the server 
 		add(rdResource); 
@@ -71,6 +74,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 	 */
 	public static ResourceDirectory getInstance() {
 
+		LOGGER.setLevel(Level.ALL);
 		return resourceDirectory;
 
 	}
@@ -185,7 +189,7 @@ public class ResourceDirectory extends CoapServer implements Runnable {
 		 * if present, put the interface description in the map
 		 */
 		String interfaceDes = null;
-		if(!resource.getAttributes().getResourceTypes().isEmpty()) {
+		if(!resource.getAttributes().getInterfaceDescriptions().isEmpty()) {
 			interfaceDes = resource.getAttributes().getInterfaceDescriptions().get(0);
 		}
 		if (interfaceDes != null) {
