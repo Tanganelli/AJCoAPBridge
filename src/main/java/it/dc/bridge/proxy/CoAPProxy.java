@@ -97,7 +97,7 @@ public class CoAPProxy implements Runnable {
 			// check the cache for a valid response
 			response = cache.getResponse(request);
 			if (response != null) {
-				LOGGER.fine("Cache returned "+response);
+				LOGGER.info("Cache returned "+response);
 				return response;
 			}
 		}

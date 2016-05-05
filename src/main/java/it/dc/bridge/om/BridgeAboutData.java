@@ -47,10 +47,11 @@ public class BridgeAboutData implements AboutDataListener {
 		// FIXME data values
 		Map<String, Variant> aboutData = new HashMap<String, Variant>();
 		aboutData.put("AppId", new Variant(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}));
-		aboutData.put("DeviceId", new Variant(new String("93c06771-c725-48c2-b1ff-6a2a59d445b8")));
-		aboutData.put("ModelNumber", new Variant("A1B2C3"));
+		aboutData.put("DeviceId", new Variant(new String("738c9f4a-ec3e-44f3-b1dc-0e6e3cb57383")));
+		aboutData.put("ModelNumber", new Variant("Bridge"));
 		aboutData.put("DefaultLanguage", new Variant("en"));
 		aboutData.put("SupportedLanguages", new Variant(new String[] { "en" }));
+		aboutData.put("DeviceName", new Variant("Bridge device"));
 		aboutData.put("AppName", new Variant("CoAPBridge"));
 		aboutData.put("Manufacturer", new Variant(new String("David Costa")));
 		aboutData.put("Description", new Variant( "An application to interconnect AllJoyn and CoAP devices"));
@@ -83,10 +84,11 @@ public class BridgeAboutData implements AboutDataListener {
 
 		Map<String, Variant> aboutData = new HashMap<String, Variant>();
 		aboutData.put("AppId", new Variant(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}));
-		aboutData.put("DeviceId", new Variant(new String("93c06771-c725-48c2-b1ff-6a2a59d445b8")));
-		aboutData.put("ModelNumber", new Variant("A1B2C3"));
+		aboutData.put("DeviceId", new Variant(new String("738c9f4a-ec3e-44f3-b1dc-0e6e3cb57383")));
+		aboutData.put("ModelNumber", new Variant("Bridge"));
 		aboutData.put("DefaultLanguage", new Variant("en"));
 		aboutData.put("AppName", new Variant("CoAPBridge"));
+		aboutData.put("DeviceName", new Variant("Bridge device"));
 		aboutData.put("Manufacturer", new Variant(new String("David Costa")));
 		aboutData.put("SoftwareVersion", new Variant(new String("1.0")));
 

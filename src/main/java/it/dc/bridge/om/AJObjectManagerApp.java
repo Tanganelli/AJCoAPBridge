@@ -108,7 +108,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * Since the class is a singleton, the constructor must be private
 	 */
 	private AJObjectManagerApp() {
-
+		
 	}
 
 	/**
@@ -258,6 +258,7 @@ public class AJObjectManagerApp implements Runnable {
 	 */
 	public void notify(String objectPath, Response coapMessage) {
 
+		LOGGER.info("A notification arrived from object "+objectPath+" with code "+coapMessage.getCode());
 		// create a ResponseMessage from a Californium Response
 		ResponseMessage message = getResponse(coapMessage);
 
@@ -289,6 +290,7 @@ public class AJObjectManagerApp implements Runnable {
 
 		// set confirmable
 		coapRequest.setConfirmable(true);
+		coapRequest.setToken(new byte[0]);
 
 		// copy the payload
 		coapRequest.setPayload(request.getPayload());
@@ -395,7 +397,7 @@ public class AJObjectManagerApp implements Runnable {
 			System.exit(0);
 			return;
 		}
-		LOGGER.fine("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address"));
+		LOGGER.info("BusAttachment.connect successful on " + System.getProperty("org.alljoyn.bus.address"));
 
 		// create the About object
 		aboutObj = new AboutObj(mBus);
@@ -408,7 +410,7 @@ public class AJObjectManagerApp implements Runnable {
 			System.exit(0);
 			return;
 		}
-		LOGGER.fine("BusAttachment.request 'com.bridge.coap' successful");
+		LOGGER.info("BusAttachment.request 'com.bridge.coap' successful");
 
 		// advertise the well known name
 		status = mBus.advertiseName("com.bridge.coap", SessionOpts.TRANSPORT_ANY);
@@ -417,7 +419,7 @@ public class AJObjectManagerApp implements Runnable {
 			mBus.releaseName("com.bridge.coap");
 			return;
 		}
-		LOGGER.fine("BusAttachment.advertiseName 'com.bridge.coap' successful");
+		LOGGER.info("BusAttachment.advertiseName 'com.bridge.coap' successful");
 
 		Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
 
@@ -435,7 +437,7 @@ public class AJObjectManagerApp implements Runnable {
 			LOGGER.warning("Announce failed " + status.toString());
 			return;
 		}
-		LOGGER.fine("Announce called announcing SessionPort: " + contactPort.value);
+		LOGGER.info("Announce called announcing SessionPort: " + contactPort.value);
 
 		// add the OnCloseThread at the shutdown
 		// TODO actually, it's not possible to exit from the Bridge
@@ -451,7 +453,7 @@ public class AJObjectManagerApp implements Runnable {
 		Status status = mBus.bindSessionPort(contactPort, sessionOpts, 
 				new SessionPortListener() {
 			public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
-				LOGGER.fine("SessionPortListener.acceptSessionJoiner called");
+				LOGGER.info("SessionPortListener.acceptSessionJoiner called");
 				if (sessionPort == CONTACT_PORT) {
 					return true;
 				} else {
@@ -459,13 +461,13 @@ public class AJObjectManagerApp implements Runnable {
 				}
 			}
 			public void sessionJoined(short sessionPort, int id, String joiner) {
-				LOGGER.fine(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
+				LOGGER.info(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
 			}
 		});
 		if (status != Status.OK) {
 			return;
 		}
-		LOGGER.fine("BusAttachment.bindSessionPort successful");
+		LOGGER.info("BusAttachment.bindSessionPort successful");
 
 	}
 
@@ -485,7 +487,7 @@ public class AJObjectManagerApp implements Runnable {
 			LOGGER.warning("Announce failed " + status.toString());
 			return;
 		}
-		LOGGER.fine("Announce called announcing SessionPort: " + contactPort.value);
+		LOGGER.info("Announce called announcing SessionPort: " + contactPort.value);
 
 	}
 
