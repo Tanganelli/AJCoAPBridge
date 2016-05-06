@@ -114,7 +114,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public Status registration(String uniqueName, final RequestMessage request) throws BusException {
 
 		// TODO extend observing as in 1.4 RFC 7641
-		Status status = null;
+		Status status = Status.OK;
 
 		// if the list is empty register to the resource
 		// FIXME it depends also on the request message fields
