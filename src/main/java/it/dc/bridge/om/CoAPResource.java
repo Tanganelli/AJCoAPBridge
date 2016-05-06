@@ -47,8 +47,16 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public CoAPResource(String path, String resourceType, String interfaceDescription) {
 
 		this.objectPath = path;
-		this.resourceType = resourceType;
-		this.interfaceDescription = interfaceDescription;
+		
+		if (resourceType == null)
+			this.resourceType = "";
+		else
+			this.resourceType = resourceType;
+		
+		if (interfaceDescription == null)
+			this.interfaceDescription = "";
+		else
+			this.interfaceDescription = interfaceDescription;
 
 	}
 
