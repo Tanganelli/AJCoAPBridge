@@ -1,7 +1,7 @@
 <!DOCTYPE node PUBLIC "-//allseen//DTD ALLJOYN Object Introspection 1.0//EN"
 "http://www.allseen.org/alljoyn/introspect-1.0.dtd">
 <node>
-  <interface name="com.coap.rest">
+  <interface name="com.bridge.Coap">
     <description>RESTful CoAP interface</description>
     <method name="cancellation">
       <description>Stop to observe the resource</description>

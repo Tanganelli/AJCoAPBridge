@@ -246,7 +246,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * <tt>addMatch(rule)</tt>, where <tt>rule</tt> is a string following the DBus specification.
 	 * The rule has to specify three fields:
 	 * <ul>
-	 * <li><tt>interface</tt>: com.coap.rest</li>
+	 * <li><tt>interface</tt>: com.bridge.Coap</li>
 	 * <li><tt>path</tt>: the object path of the resource it registered</li>
 	 * <li><tt>sessionless</tt>: t (true)</li>
 	 * </ul>

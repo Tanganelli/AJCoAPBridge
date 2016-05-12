@@ -22,14 +22,14 @@ import it.dc.bridge.rd.ResourceDirectory;
  * register itself to the <tt>Bridge</tt>, in particular, it registers to the
  * <tt>ResourceDirectory</tt>.
  * An AllJoyn client application can find CoAP resources looking for AllJoyn objects
- * that implement the <i>"com.coap.rest"</i> interface.
+ * that implement the <i>"com.bridge.Coap"</i> interface.
  * Then, it can interact with CoAP servers using the two message classes:
  * <ul>
  * <li><tt>RequestMessage</tt></li>
  * <li><tt>ResponseMessage</tt></li>
  * </ul>
  * <p>
- * The <tt>CoAPInterface</tt> (the <i>"com.coap.rest"</i> interface mentioned before)
+ * The <tt>CoAPInterface</tt> (the <i>"com.bridge.Coap"</i> interface mentioned before)
  * allows the application to call the RESTful methods on the object (GET, POST, DELETE)
  * and to register/unregister from its notifications.
  */

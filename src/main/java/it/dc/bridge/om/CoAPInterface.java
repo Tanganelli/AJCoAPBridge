@@ -33,7 +33,7 @@ import org.alljoyn.bus.annotation.BusSignal;
  * @see RequestMessage
  * @see ResponseMessage
  */
-@BusInterface (name="com.coap.rest", announced="true", descriptionLanguage="en", description="RESTful CoAP interface")
+@BusInterface (name="com.bridge.Coap", announced="true", descriptionLanguage="en", description="RESTful CoAP interface")
 public interface CoAPInterface {
 
 	/**
