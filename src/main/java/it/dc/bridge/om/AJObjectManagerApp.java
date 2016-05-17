@@ -53,8 +53,11 @@ public class AJObjectManagerApp implements Runnable {
 	/* map containing the <object path, AJ object> pair for each registered object */
 	private static Map<String, CoAPResource> resources = new ConcurrentHashMap<String, CoAPResource>();
 
-	/* map containing the <object path, signal emitter> pair for each object */
-	private static Map<String, SignalEmitter> emitters = new ConcurrentHashMap<String, SignalEmitter>();
+	/* map containing the <object path, uniqueName, signal emitter> tuple for each object */
+	private static Map<String, Map<String, SignalEmitter>> emitters = new ConcurrentHashMap<String, Map<String, SignalEmitter>>();
+
+	/* map containing the <uniqueName, sessionId> for each joiner */
+	private static Map<String, Integer> sessions = new ConcurrentHashMap<String, Integer>();
 
 	/* a connection to the message bus */
 	private static BusAttachment mBus;
@@ -108,7 +111,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * Since the class is a singleton, the constructor must be private
 	 */
 	private AJObjectManagerApp() {
-		
+
 	}
 
 	/**
@@ -148,10 +151,7 @@ public class AJObjectManagerApp implements Runnable {
 		// put the new object in the resources map
 		resources.put(objectPath, resource);
 
-		// create a signal emitter and associate it to the object
-		SignalEmitter emitter = new SignalEmitter(resource, 0, SignalEmitter.GlobalBroadcast.Off);
-		emitter.setSessionlessFlag(true);
-		emitters.put(objectPath, emitter);
+
 
 		// announce the new object to the AJ network
 		announce();
@@ -171,7 +171,7 @@ public class AJObjectManagerApp implements Runnable {
 		// remove the object from the resource map
 		resources.remove(objectPath);
 
-		// remove the signal emitter
+		// remove all the signal emitter associated to the specified object
 		emitters.remove(objectPath);
 
 		// send the about data
@@ -217,11 +217,36 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param request the request message
 	 * @return status code
 	 */
-	public synchronized Status register(String objectPath, CoAPRequestMessage request) {
+	public synchronized Status register(String uniqueName, String objectPath, CoAPRequestMessage request) {
+
+		Status status = Status.OK;
 
 		Request coapRequest = getRequest(RequestCode.GET, request);
 
-		return CoAPProxy.getInstance().register(objectPath, coapRequest);
+		CoAPResource resource = resources.get(objectPath);
+		Integer sessionId = sessions.get(uniqueName);
+
+		// create a signal emitter and associate it to the object
+		SignalEmitter emitter = new SignalEmitter(resource, uniqueName, sessionId, SignalEmitter.GlobalBroadcast.Off);
+
+		// if the observer is the first one, send registration to the CoAP server
+		Map<String, SignalEmitter> tmpEmitters = emitters.get(objectPath);
+		if (tmpEmitters == null) {
+			tmpEmitters = new ConcurrentHashMap<String, SignalEmitter>();
+
+			status = CoAPProxy.getInstance().register(objectPath, coapRequest);
+		}
+
+		// if the registration does not fail and the observer is not already registered, add it
+		if (status == Status.OK && !tmpEmitters.containsKey(uniqueName)) {
+			tmpEmitters.put(uniqueName, emitter);
+
+			emitters.put(objectPath, tmpEmitters);
+
+			LOGGER.info("Added signal emitter associated to: uniqueName="+uniqueName+" object="+objectPath);
+		}
+
+		return status;
 
 	}
 
@@ -230,9 +255,24 @@ public class AJObjectManagerApp implements Runnable {
 	 * 
 	 * @param objectPath the object path
 	 */
-	public synchronized void cancel(String objectPath) {
+	public synchronized void cancel(String uniqueName, String objectPath) {
 
-		CoAPProxy.getInstance().cancel(objectPath);
+		// remove the emitter with key <uniqueName, objectPath>
+		Map<String, SignalEmitter> tmpEmitters = emitters.get(objectPath);
+		if (tmpEmitters == null)
+			return;
+		tmpEmitters.remove(uniqueName);
+
+		if (tmpEmitters.isEmpty()) {
+			emitters.remove(objectPath);
+
+			// there are no more observers for that resource
+			CoAPProxy.getInstance().cancel(objectPath);
+		} else {
+			emitters.put(objectPath, tmpEmitters);
+		}
+
+		LOGGER.info("Removed signal emitter associated to: uniqueName="+uniqueName+" object="+objectPath);
 
 	}
 
@@ -248,7 +288,6 @@ public class AJObjectManagerApp implements Runnable {
 	 * <ul>
 	 * <li><tt>interface</tt>: com.bridge.Coap</li>
 	 * <li><tt>path</tt>: the object path of the resource it registered</li>
-	 * <li><tt>sessionless</tt>: t (true)</li>
 	 * </ul>
 	 * If the rule is not added or not all the three fields are correctly set
 	 * the client will not receive notifications.
@@ -262,15 +301,21 @@ public class AJObjectManagerApp implements Runnable {
 		// create a ResponseMessage from a Californium Response
 		ResponseMessage message = getResponse(coapMessage);
 
-		// get the object signal emitter
-		SignalEmitter emitter = emitters.get(objectPath);
-		objectInterface = emitter.getInterface(CoAPInterface.class);
+		// get the object signal emitters
+		Map<String, SignalEmitter> tmpEmitters = emitters.get(objectPath);
 
-		try {
-			// send the notification
-			objectInterface.notification(message);
-		} catch (BusException e) {
-			LOGGER.severe("AllJoyn BusException during notification.");
+		// for each emitter associated to the object, send the notification
+		for(Entry<String, SignalEmitter> e : tmpEmitters.entrySet()) {
+
+			SignalEmitter emitter = e.getValue();
+			objectInterface = emitter.getInterface(CoAPInterface.class);
+
+			try {
+				// send the notification
+				objectInterface.notification(message);
+			} catch (BusException exception) {
+				LOGGER.severe("AllJoyn BusException during notification.");
+			}
 		}
 
 	}
@@ -431,7 +476,7 @@ public class AJObjectManagerApp implements Runnable {
 
 		// bind session port with the session options
 		objectManager.bindSessionPort(contactPort, sessionOpts);
-		
+
 		status = aboutObj.announce(contactPort.value, new BridgeAboutData());
 		if (status != Status.OK) {
 			LOGGER.warning("Announce failed " + status.toString());
@@ -462,6 +507,7 @@ public class AJObjectManagerApp implements Runnable {
 			}
 			public void sessionJoined(short sessionPort, int id, String joiner) {
 				LOGGER.info(String.format("SessionPortListener.sessionJoined(%d, %d, %s)", sessionPort, id, joiner));
+				sessions.put(joiner, id);
 			}
 		});
 		if (status != Status.OK) {

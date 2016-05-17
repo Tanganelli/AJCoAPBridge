@@ -1,7 +1,5 @@
 package it.dc.bridge.om;
 
-import java.util.ArrayList;
-
 import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.BusObject;
 import org.alljoyn.bus.Status;
@@ -35,8 +33,6 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	/** The Interface Description */
 	private String interfaceDescription;
 
-	private ArrayList<String> observers = new ArrayList<String>();
-
 	/**
 	 * Instantiates a new CoAP resource with an object path.
 	 *
@@ -47,12 +43,12 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public CoAPResource(String path, String resourceType, String interfaceDescription) {
 
 		this.objectPath = path;
-		
+
 		if (resourceType == null)
 			this.resourceType = "";
 		else
 			this.resourceType = resourceType;
-		
+
 		if (interfaceDescription == null)
 			this.interfaceDescription = "";
 		else
@@ -122,20 +118,8 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	public Status registration(String uniqueName, final RequestMessage request) throws BusException {
 
 		// TODO extend observing as in 1.4 RFC 7641
-		Status status = Status.OK;
-
-		// if the list is empty register to the resource
 		// FIXME it depends also on the request message fields
-		if (observers.isEmpty()) {
-			status = AJObjectManagerApp.getInstance().register(objectPath, request);
-		}
-
-		// if the client is not present, add it to the observer list
-		if (status == Status.OK && !observers.contains(uniqueName)) {
-			observers.add(uniqueName);
-		}
-
-		return status;
+		return AJObjectManagerApp.getInstance().register(uniqueName, objectPath, request);
 
 	}
 
@@ -144,10 +128,7 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 */
 	public void cancellation(String uniqueName) throws BusException {
 
-		// remove the client from the list and if the list remains empty unregister
-		if (observers.remove(uniqueName) && observers.isEmpty()) {
-			AJObjectManagerApp.getInstance().cancel(objectPath);
-		}
+		AJObjectManagerApp.getInstance().cancel(uniqueName, objectPath);
 
 	}
 
