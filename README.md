@@ -19,6 +19,20 @@ $ scons BINDINGS=java
 
 What **AJCoAPBridge** needs are the _alljoyn.jar_ file and the _liballjoyn_java.so_ (or _liballjoyn_java.dylib_ or _liballjoyn_java.dll_) libraries.
 
+## Installation
+In order to install **AJCoAPBridge** you have to compile the source with Maven.
+Before it, you need to include the AllJoyn library. Starting from the root directory (where the _pom.xml_ file is), put _alljoyn.jar_ in the _/jar_ directory and the _liballjoyn.so_ file in the _/lib_ directory.
+Then, run the Maven installer:
+```
+$ mvn clean install
+```
+
+## Execution
+The executable JAR file is in the _/target_ directory. In order to include the AllJoyn native library, run it with the _java.library.path_ option set to the _/lib_ folder:
+```
+$ java -Djava.library.path=lib -jar target/bridge-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+```
+
 ## User Guide
 ### CoAP Server
 A CoAP device that wants to provide its resources to the AllJoyn network has to register on the bridge using its Resource Directory.
