@@ -25,6 +25,9 @@ target/
 # Compiled Static libraries
 *.a
 *.lib
+
+# Include AllJoyn
+!jar/alljoyn.jar
  
 ######################
 # Windows
