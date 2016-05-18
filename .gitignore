@@ -10,7 +10,7 @@ target/
 .DS_Store
  
 *.class
- 
+
 # Package Files #
 *.jar
 *.war
@@ -25,10 +25,10 @@ target/
 # Compiled Static libraries
 *.a
 *.lib
-
-# Include AllJoyn
-!jar/alljoyn.jar
  
+# Include AllJoyn
+!alljoyn.jar
+
 ######################
 # Windows
 ######################
