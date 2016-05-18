@@ -213,6 +213,7 @@ public class AJObjectManagerApp implements Runnable {
 	 * Sends to the <tt>CoAPProxy</tt> a request in order to receive
 	 * future notifications from that resource.
 	 * 
+	 * @param uniqueName the client unique name
 	 * @param objectPath the object path of the observable resource
 	 * @param request the request message
 	 * @return status code
@@ -253,6 +254,7 @@ public class AJObjectManagerApp implements Runnable {
 	/**
 	 * Informs the <tt>CoAPProxy</tt> to stop receiving notifications.
 	 * 
+	 * @param uniqueName the client unique name
 	 * @param objectPath the object path
 	 */
 	public synchronized void cancel(String uniqueName, String objectPath) {
