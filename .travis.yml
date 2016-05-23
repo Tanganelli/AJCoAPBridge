@@ -1,5 +1,5 @@
 language: java
 
 install:
-  mvn install:install-file -Dfile=jar/alljoyn.jar -DgroupId=org.alljoyn -DartifactId=liballjoyn_java -Dversion=15.09 -Dpackaging=jar
-  mvn clean install
+- mvn install:install-file -Dfile=jar/alljoyn.jar -DgroupId=org.alljoyn -DartifactId=liballjoyn_java -Dversion=15.09 -Dpackaging=jar
+- mvn clean install
