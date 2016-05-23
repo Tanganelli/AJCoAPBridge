@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/cstdvd/AJCoAPBridge.svg?branch=master)](https://travis-ci.org/cstdvd/AJCoAPBridge)
 # AJCoAPBridge
 **AJCoAPBridge** is an application that enables AllJoyn applications to interact with CoAP devices.
 
