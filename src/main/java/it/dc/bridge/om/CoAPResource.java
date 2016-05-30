@@ -32,6 +32,9 @@ public class CoAPResource implements CoAPInterface, BusObject{
 
 	/** The Interface Description */
 	private String interfaceDescription;
+	
+	/** The Endpoint name */
+	private String endpointName;
 
 	/**
 	 * Instantiates a new CoAP resource with an object path.
@@ -39,10 +42,13 @@ public class CoAPResource implements CoAPInterface, BusObject{
 	 * @param path the object path
 	 * @param resourceType the Resource Type
 	 * @param interfaceDescription the Interface Description
+	 * @param endpointName the Endpoint Name
 	 */
-	public CoAPResource(String path, String resourceType, String interfaceDescription) {
+	public CoAPResource(String path, String resourceType, String interfaceDescription, String endpointName) {
 
 		this.objectPath = path;
+		
+		this.endpointName = endpointName;
 
 		if (resourceType == null)
 			this.resourceType = "";
@@ -157,6 +163,12 @@ public class CoAPResource implements CoAPInterface, BusObject{
 
 		return interfaceDescription;
 
+	}
+
+	public String getEndpoint() throws BusException {
+
+		return endpointName;
+		
 	}
 
 }

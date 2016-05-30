@@ -133,10 +133,11 @@ public class AJObjectManagerApp implements Runnable {
 	 * @param objectPath the object path
 	 * @param resourceType the resource type (can be null)
 	 * @param interfaceDescription the interface description (can be null)
+	 * @param endpointName the endpoint name
 	 */
-	public synchronized void addResource(String objectPath, String resourceType, String interfaceDescription) {
+	public synchronized void addResource(String objectPath, String resourceType, String interfaceDescription, String endpointName) {
 
-		CoAPResource resource = new CoAPResource(objectPath, resourceType, interfaceDescription);
+		CoAPResource resource = new CoAPResource(objectPath, resourceType, interfaceDescription, endpointName);
 
 		// register the new object to the bus
 		Status status = mBus.registerBusObject(resource, objectPath);

@@ -127,5 +127,16 @@ public interface CoAPInterface {
 	 */
 	@BusProperty (name="getInterfaceDescription", description="Returns the Interface Description field")
 	public String getInterfaceDescription() throws BusException;
+	
+	/**
+	 * The Endpoint Name <i>ep</i> attribute is an opaque string used by
+	 * a device during its registration on the RD.
+	 * It must be unique within the CoAP network.
+	 * 
+	 * @return the Endpoint field
+	 * @throws BusException AllJoyn bus exception
+	 */
+	@BusProperty (name="getEndpoint", description="Returns the Endpoint name")
+	public String getEndpoint() throws BusException;
 
 }

@@ -31,6 +31,9 @@
 			<arg type="((iasiasbi)a{ss}ay)" direction="in" />
 			<arg type="i" direction="out" />
 		</method>
+		<property name="getEndpoint" type="s" access="read">
+			<description>Returns the Endpoint name</description>
+		</property>
 		<property name="getInterfaceDescription" type="s" access="read">
 			<description>Returns the Interface Description field</description>
 		</property>
