@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Ajcoapbridge : The bridge enables AllJoyn applications to interact with CoAP devices">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Ajcoapbridge</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/cstdvd/AJCoAPBridge">View on GitHub</a>
+
+          <h1 id="project_title">Ajcoapbridge</h1>
+          <h2 id="project_tagline">The bridge enables AllJoyn applications to interact with CoAP devices</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/cstdvd/AJCoAPBridge/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/cstdvd/AJCoAPBridge/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="ajcoapbridge" class="anchor" href="#ajcoapbridge" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>AJCoAPBridge</h1>
+
+<p><strong>AJCoAPBridge</strong> is an application that enables AllJoyn applications to interact with CoAP devices.</p>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
+
+<h3>
+<a id="obtain-the-alljoyn-source" class="anchor" href="#obtain-the-alljoyn-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Obtain the AllJoyn source</h3>
+
+<p>The bridge requires the AllJoyn framework to run.
+The framework source can be obtained in the AllSeen Alliance <a href="https://allseenalliance.org/framework/download">download page</a>.
+The bridge was developed using AllJoyn v15.09 and it requires that version or later ones.</p>
+
+<h3>
+<a id="building-the-alljoyn-framework" class="anchor" href="#building-the-alljoyn-framework" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building the AllJoyn Framework</h3>
+
+<p>Depending on the target platform, check out the recommended steps to build AllJoyn following the <a href="https://allseenalliance.org/framework/documentation/develop/building">building documentation</a>.
+<strong>AJCoAPBridge</strong> was tested on Linux, Windows and Mac OS X.</p>
+
+<p>The default SCons script tries to build all of the language bindings by default.
+We are only interested in the Java language binding, so the BINDINGS option can be used to select the language of interest.</p>
+
+<pre><code>$ scons BINDINGS=java
+</code></pre>
+
+<p>What <strong>AJCoAPBridge</strong> needs are the <em>alljoyn.jar</em> file and the <em>liballjoyn_java.so</em> (or <em>liballjoyn_java.dylib</em> or <em>liballjoyn_java.dll</em>) libraries.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>In order to install <strong>AJCoAPBridge</strong> you have to compile the source with Maven.
+Before it, you need to include the AllJoyn library. Starting from the root directory (where the <em>pom.xml</em> file is), put <em>alljoyn.jar</em> in the <em>/jar</em> directory and the <em>liballjoyn.so</em> file in the <em>/lib</em> directory.
+Then, run the Maven installer:</p>
+
+<pre><code>$ mvn clean install
+</code></pre>
+
+<h2>
+<a id="execution" class="anchor" href="#execution" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Execution</h2>
+
+<p>The executable JAR file is in the <em>/target</em> directory. In order to include the AllJoyn native library, run it with the <em>java.library.path</em> option set to the <em>/lib</em> folder:</p>
+
+<pre><code>$ java -Djava.library.path=lib -jar target/bridge-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+</code></pre>
+
+<h2>
+<a id="user-guide" class="anchor" href="#user-guide" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>User Guide</h2>
+
+<h3>
+<a id="coap-server" class="anchor" href="#coap-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>CoAP Server</h3>
+
+<p>A CoAP device that wants to provide its resources to the AllJoyn network has to register on the bridge using its Resource Directory.
+The resources registration is done by sending a <em>POST</em> request with <em>/{+rd}{?ep,lt,con}</em> as URI template, where:</p>
+
+<ul>
+<li>
+<em>ep</em> is the endpoint name (mandatory)</li>
+<li>
+<em>lt</em> is the lifetime on the bridge (optional)</li>
+<li>
+<em>con</em> is the endpoint context, if different from the source IP address and port (optional)</li>
+</ul>
+
+<p>In the payload the CoAP server should include the resources it wants to register as shown in the following example:</p>
+
+<pre><code>&lt;/sensors/temp&gt;;ct=41;rt="temperature-c";if="sensor",
+&lt;/sensors/light&gt;;ct=41;rt="light-lux";if="sensor"
+</code></pre>
+
+<p>The Resource Directory then returns the resources location.
+An endpoint must use that location when refreshing or deleting registrations using this interface.</p>
+
+<h3>
+<a id="alljoyn-client-application" class="anchor" href="#alljoyn-client-application" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>AllJoyn Client Application</h3>
+
+<h4>
+<a id="discovery" class="anchor" href="#discovery" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Discovery</h4>
+
+<p>The bridge sends out about data every time a new CoAP resource is made available or removed. The about data is described in the <a href="https://allseenalliance.org/framework/documentation/learn/core/about-announcement/interface">About definition</a>
+and it contains all the AllJoyn paths of the objects provided by the bridge. Each of these object represent a CoAP resource.</p>
+
+<p>An AllJoyn client can obtain the bridge about data by looking for the <em>com.bridge.Coap</em> interface:</p>
+
+<pre><code>Status status = mBus.whoImplements("com.bridge.Coap");
+</code></pre>
+
+<h4>
+<a id="alljoyn-objects" class="anchor" href="#alljoyn-objects" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>AllJoyn Objects</h4>
+
+<p>An AllJoyn client can interact with CoAP resources using a proxy object (a representation of the <em>CoAPResource</em> object provided by the bridge) on which it can call methods.
+In order to obtain a proxy object, the object path has to be specified (known or taken from the about data):</p>
+
+<pre><code>mProxyObj =  mBus.getProxyBusObject("com.bridge.coap",objectPath,sessionId.value,new Class&lt;?&gt;[] { CoAPInterface.class, Properties.class, AllSeenIntrospectable.class});
+</code></pre>
+
+<p>The AllJoyn objects implement the <em>com.bridge.Coap</em> interface and implement the RESTful methods:</p>
+
+<ul>
+<li><em>get</em></li>
+<li><em>post</em></li>
+<li><em>delete</em></li>
+</ul>
+
+<p>Request and response messages (function parameter and returned value, respectively) are represented by the <em>RequestMessage</em> and the <em>ResponseMessage</em> classes.</p>
+
+<p>The interface allows the client to read the resource attributes via its property functions:</p>
+
+<ul>
+<li><em>getInterfaceDescription</em></li>
+<li><em>getResourceType</em></li>
+</ul>
+
+<h4>
+<a id="observing-service" class="anchor" href="#observing-service" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Observing Service</h4>
+
+<p><strong>AJCoAPBridge</strong> also implements the observing service. An AllJoyn application interested into observing a resource calls the <em>registration</em> method on the object representing that resource.
+Then, it can stop receiving notifications using the <em>cancellation</em> method.</p>
+
+<p>The bridge forwards notifications using signals. In order to receive these notifications a client application must register the interest in a signal by calling the <em>AddMatch</em> method, in which it specifies the object interface and path:</p>
+
+<pre><code>Status status = mBus.addMatch("interface='com.bridge.Coap',path='/rd/4521/sensors/temp'");
+</code></pre>
+
+<p>The client must implement a signal handler to respond to the signal for which it has registered.
+It is done implementing a class that contains a method with the <em>@BusSignalHandler</em> annotation.</p>
+
+<pre><code>public static class MySignalHandler  {
+    @BusSignalHandler(iface="it.dc.ajtest.CoAPInterface", signal="notification")
+        public void notification(ResponseMessage message) {
+            // do something
+        }
+    }
+</code></pre>
+
+<p>Then, the client must register the implemented signal handler:</p>
+
+<pre><code>status = mBus.registerSignalHandlers(mySignalHandler);
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Ajcoapbridge maintained by <a href="https://github.com/cstdvd">cstdvd</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
