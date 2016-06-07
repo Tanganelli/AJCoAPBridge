@@ -1,6 +1,7 @@
 package it.dc.bridge.proxy;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import org.alljoyn.bus.Status;
@@ -101,6 +102,10 @@ public class CoAPProxy implements Runnable {
 				return response;
 			}
 		}
+		
+		byte[] b = new byte[4];
+		new Random().nextBytes(b);
+		request.setToken(b);
 
 		LOGGER.info("CoAP Proxy sends a "+request.getCode()+" method call to "+context+" on the resource "+path);
 
@@ -158,9 +163,15 @@ public class CoAPProxy implements Runnable {
 		options.setUriHost(request.getDestination().getHostAddress());
 		options.setUriPort(request.getDestinationPort());
 		request.setOptions(options);
+		
+		byte[] b = new byte[4];
+		new Random().nextBytes(b);
+		request.setToken(b);
 
 		// set the observe option
 		request.setObserve();
+		
+		System.out.println(request.getTokenString());
 
 		LOGGER.info("CoAPProxy requests for observe the resource "+path+" from "+context);
 		request.send();
